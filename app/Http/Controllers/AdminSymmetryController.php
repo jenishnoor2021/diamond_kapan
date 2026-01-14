@@ -1,0 +1,115 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Symmetry;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Validator;
+
+class AdminSymmetryController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $symmetryes = Symmetry::orderBy('id', 'DESC')->get();
+        return view('admin.symmetry.index', compact('symmetryes'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('admin.symmetry.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $input = $request->all();
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return Redirect::back()->withInput($input)->withErrors($validator);
+        }
+
+        Symmetry::create($input);
+        // return redirect('admin/color')->with('success', "Add Record Successfully");/
+        return Redirect::back()->with('success', "Add Record Successfully");
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $symmetry = Symmetry::findOrFail($id);
+        return view('admin.symmetry.edit', compact('symmetry'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $push = Symmetry::findOrFail($id);
+
+        $input = $request->all();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return Redirect::back()->withInput($input)->withErrors($validator);
+        }
+
+        $push->update($input);
+        return redirect('admin/symmetry')->with('success', "Update Record Successfully");
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $symmetry = Symmetry::findOrFail($id);
+        $symmetry->delete();
+        return Redirect::back()->with('success', "Delete Record Successfully");
+    }
+}
