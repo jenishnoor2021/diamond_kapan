@@ -172,9 +172,12 @@ class AdminIssueController extends Controller
         if ($request->filled('worker_id')) {
 
             $issues = Issue::with('diamond')
-                // ->where('kapans_id', $request->kapans_id)
                 ->where('worker_id', $request->worker_id)
                 ->where('is_return', 0)
+
+                ->when($request->filled('kapans_id'), function ($q) use ($request) {
+                    $q->where('kapans_id', $request->kapans_id);
+                })
 
                 ->when($request->filled('kapan_parts_id'), function ($q) use ($request) {
                     $q->where('kapan_parts_id', $request->kapan_parts_id);
@@ -183,7 +186,9 @@ class AdminIssueController extends Controller
                 ->orderBy('id', 'ASC')
                 ->get();
 
-            $kapan_parts = KapanPart::where('kapans_id', $request->kapans_id)->get();
+            if ($request->filled('kapans_id')) {
+                $kapan_parts = KapanPart::where('kapans_id', $request->kapans_id)->get();
+            }
         }
 
         return view('admin.issue.return', compact(

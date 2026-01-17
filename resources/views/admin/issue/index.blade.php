@@ -69,7 +69,7 @@
               </div>
 
               <div class="col-lg-4">
-                <button type="submit" class="btn btn-success mt-2 w-md">Submit</button>
+                <button type="submit" class="btn btn-primary mt-2 w-md">Submit</button>
                 <!-- <a class="btn btn-light mt-2 w-md" href="/admin/issue">Clear</a> -->
               </div>
 

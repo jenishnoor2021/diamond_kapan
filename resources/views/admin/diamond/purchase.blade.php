@@ -1,3 +1,7 @@
+<?php
+
+use App\Models\Issue;
+?>
 @extends('layouts.admin')
 @section('content')
 
@@ -37,6 +41,14 @@
 
                     <tbody>
                         @foreach ($purchases as $purchase)
+
+                        <?php
+                        $cRWeight = 0;
+                        $certiReturn = Issue::where('designation_id', 3)->where('diamonds_id', $purchase->diamonds_id)->first();
+                        if ($certiReturn) {
+                            $cRWeight = $certiReturn->return_weight;
+                        }
+                        ?>
                         <tr>
                             <td>
                                 <a href="{{ route('admin.purchase.edit', $purchase->id) }}" target="_blank" class="btn btn-outline-primary waves-effect waves-light"><i class="fa fa-edit"></i></a>
@@ -47,7 +59,7 @@
                                     data-id="{{ $purchase->id }}"
                                     data-diamonds_id="{{ $purchase->diamonds_id }}"
                                     data-name="{{ $purchase->diamond->diamond_name }}"
-                                    data-pweight="{{ $purchase->diamond->prediction_weight }}">
+                                    data-pweight="{{ $cRWeight }}">
                                     Sell
                                 </button>
                             </td>
