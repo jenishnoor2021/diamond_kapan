@@ -168,7 +168,8 @@
                     data-bs-toggle="modal"
                     data-bs-target="#certificateModal"
                     data-id="{{ $issue->id }}"
-                    data-diamonds_id="{{ $issue->diamonds_id }}">
+                    data-diamonds_id="{{ $issue->diamonds_id }}"
+                    data-prediction="{{ $issue->diamond->prediction_weight }}">
                     Add & save
                   </button>
                 </td>
@@ -216,22 +217,31 @@
 
           <div class="row">
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-12 mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="is_certified" name="is_non_certi" value="1" checked>
+                <label class="form-check-label fw-bold" for="is_certified">
+                  Certified Diamond
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-2 certi-field">
               <label>Certificate #</label>
               <input type="text" name="certi_no" id="certi_no" class="form-control" placeholder="Enter certi no" required>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-8 mb-2 certi-field">
               <label>Certificate Url</label>
               <input type="text" name="Certificate_url" class="form-control" placeholder="Enter Certificate Url" required>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Availability</label>
-              <input type="text" name="availability" id="availability" class="form-control" placeholder="Enter ceavailability" required>
+              <input type="text" name="availability" id="availability" class="form-control" placeholder="Enter ailability" required>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Return Weight</label>
               <input type="number"
                 step="0.01"
@@ -240,12 +250,15 @@
                 id="return_weight"
                 value=""
                 max=""
+                data-prediction=""
                 data-issue-weight=""
                 placeholder="returm weight"
                 required>
+              <small id="weightMessage"></small>
             </div>
 
-            <div class="col-md-4 mb-2">
+
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Return Date</label>
               <input type="date"
                 name="return_date"
@@ -256,7 +269,7 @@
                 required>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Shape</label>
               <select name="r_shape" id="r_shape" class="form-select" required>
                 @foreach($shapes as $shape)
@@ -265,7 +278,7 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Color</label>
               <select name="r_color" id="r_color" class="form-select" required>
                 @foreach($colors as $color)
@@ -274,7 +287,7 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Clarity</label>
               <select name="r_clarity" id="r_clarity" class="form-select" required>
                 @foreach($clarity as $clar)
@@ -283,7 +296,7 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Polish</label>
               <select name="r_polish" id="r_polish" class="form-select" required>
                 @foreach($polish as $pol)
@@ -292,7 +305,7 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Symmetry</label>
               <select name="r_symmetry" id="r_symmetry" class="form-select" required>
                 @foreach($symmetry as $symme)
@@ -301,57 +314,82 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Price</label>
               <input type="number" step="0.01" name="price" id="price" class="form-control" placeholder="Enter Price">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
+              <label>Discount</label>
+              <input type="number" step="0.01" name="discount" id="discount" class="form-control" placeholder="Enter Discount in %">
+            </div>
+
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Total price</label>
               <input type="number" step="0.01" name="total_price" id="total_price" class="form-control" placeholder="Enter total price">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Image Link</label>
               <input type="text" name="image_link" class="form-control" placeholder="Enter image link">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>video Link</label>
               <input type="text" name="video_link" class="form-control" placeholder="Enter video link">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Depth Percent</label>
               <input type="number" step="0.01" name="depth_percent" class="form-control" placeholder="Enter depth percent">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Table Percent</label>
               <input type="number" step="0.01" name="table_percent" class="form-control" placeholder="Enter table percent">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Fluorescence Intensity</label>
-              <input type="text" name="fluorescence_intensity" class="form-control" placeholder="Enter fluorescence intensity">
+              <input type="text" name="fluorescence_intensity" class="form-control" value="NONE" placeholder="Enter fluorescence intensity">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Lab</label>
               <input type="text" name="lab" class="form-control" placeholder="Enter Lab">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
               <label>Measurements</label>
               <input type="text" name="measurements" class="form-control" placeholder="Enter measurements">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>BGM</label>
-              <input type="text" name="bgm" class="form-control" placeholder="None">
+              <input type="text" name="bgm" class="form-control" value="NONE" placeholder="None">
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 non-certi-field">
+              <label>Fancy Color</label>
+              <input type="text" name="fancy_color" class="form-control" placeholder="Enter Fancy Color">
+            </div>
+
+            <div class="col-md-4 mb-2 certi-field">
+              <label>Fancy Color Intensity</label>
+              <input type="text" name="fancy_color_intensity" class="form-control" placeholder="Enter Fancy Color Intencity">
+            </div>
+
+            <div class="col-md-4 mb-2 certi-field">
+              <label>Cut Grade</label>
+              <select name="cut_grade" id="cut_grade" class="form-select">
+                <option value="">NONE</option>
+                <option value="IDEAL">IDEAL</option>
+                <option value="EX">EX</option>
+                <option value="VG">VG</option>
+              </select>
+            </div>
+
+            <div class="col-md-4 mb-2 certi-field">
               <label>H&A</label>
               <select name="h_and_a" id="h_and_a" class="form-select">
                 <option value="No">No</option>
@@ -359,21 +397,21 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>City</label>
               <select name="city" id="city" class="form-select" required>
                 <option value="SURAT">SURAT</option>
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>State</label>
               <select name="state" id="state" class="form-select" required>
                 <option value="GUJARAT">GUJARAT</option>
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Country</label>
               <select name="country" id="country" class="form-select">
                 <option value="India">India</option>
@@ -381,7 +419,7 @@
             </div>
 
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Eye Clean</label>
               <select name="eye_clean" id="eye_clean" class="form-select">
                 <option value="Yes">Yes</option>
@@ -389,9 +427,9 @@
               </select>
             </div>
 
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mb-2 certi-field">
               <label>Growth Type</label>
-              <input type="text" name="growth_type" class="form-control" placeholder="CVD">
+              <input type="text" name="growth_type" class="form-control" value="CVD" placeholder="CVD">
             </div>
 
           </div>
@@ -479,13 +517,31 @@
   });
 
 
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.certificateBtn').forEach(button => {
-      button.addEventListener('click', function() {
-        document.getElementById('issue_id').value = this.dataset.id;
-        document.getElementById('diamonds_id').value = this.dataset.diamonds_id;
-      });
-    });
+  // document.addEventListener('DOMContentLoaded', function() {
+  //   document.querySelectorAll('.certificateBtn').forEach(button => {
+  //     button.addEventListener('click', function() {
+  //       document.getElementById('issue_id').value = this.dataset.id;
+  //       document.getElementById('diamonds_id').value = this.dataset.diamonds_id;
+  //     });
+  //   });
+  // });
+
+  document.addEventListener('click', function(e) {
+    let btn = e.target.closest('.certificateBtn');
+    if (btn) {
+      document.getElementById('issue_id').value = btn.dataset.id;
+      document.getElementById('diamonds_id').value = btn.dataset.diamonds_id;
+
+      let prediction = parseFloat(btn.dataset.prediction);
+
+      let input = document.getElementById('return_weight');
+      input.dataset.prediction = prediction;
+      input.value = '';
+
+      document.getElementById('weightMessage').innerHTML =
+        "Predicted Weight: " + prediction;
+
+    }
   });
 
   $('#return_weight, #price').on('input', function() {
@@ -525,5 +581,101 @@
       }
     }
   });
+
+  document.getElementById('return_weight').addEventListener('input', function() {
+
+    let prediction = parseFloat(this.dataset.prediction);
+    let returnWeight = parseFloat(this.value);
+
+    if (isNaN(returnWeight)) {
+      document.getElementById('weightMessage').innerHTML = '';
+      return;
+    }
+
+    let difference = (prediction - returnWeight).toFixed(2);
+
+    if (difference > 0) {
+      document.getElementById('weightMessage').innerHTML =
+        "<span class='text-warning'>Diffrence is : " + difference + "</span>";
+    } else if (difference < 0) {
+      document.getElementById('weightMessage').innerHTML =
+        "<span class='text-danger'>Diffrence is : " + Math.abs(difference) + "</span>";
+    } else {
+      document.getElementById('weightMessage').innerHTML =
+        "<span class='text-success'>Exact Match</span>";
+    }
+  });
+</script>
+<script>
+  document.getElementById('certi_no').addEventListener('input', function() {
+    let certiNo = this.value.trim();
+
+    let baseUrl = "https://api.igi.org/viewpdf.php?r=";
+
+    document.querySelector('[name="Certificate_url"]').value = certiNo ?
+      baseUrl + certiNo :
+      '';
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+
+    const checkbox = document.getElementById('is_certified');
+
+    // Store original required
+    document.querySelectorAll('#certificateModal input, #certificateModal select')
+      .forEach(el => {
+        if (el.required) {
+          el.dataset.originalRequired = "true";
+        }
+      });
+
+    function toggleFields() {
+
+      const certiFields = document.querySelectorAll('.certi-field');
+
+      certiFields.forEach(field => {
+
+        if (checkbox.checked) {
+
+          field.style.display = '';
+
+          field.querySelectorAll('input, select').forEach(el => {
+            if (el.dataset.originalRequired === "true") {
+              el.required = true;
+            }
+          });
+
+        } else {
+
+          field.style.display = 'none';
+
+          field.querySelectorAll('input, select').forEach(el => {
+            el.required = false;
+          });
+        }
+
+      });
+    }
+
+    checkbox.addEventListener('change', toggleFields);
+    toggleFields();
+  });
+</script>
+<script>
+  document.getElementById('price').addEventListener('input', calculateTotal);
+  document.getElementById('discount').addEventListener('input', calculateTotal);
+  document.getElementById('return_weight').addEventListener('input', calculateTotal);
+
+  function calculateTotal() {
+    let price = parseFloat(document.getElementById('price').value) || 0;
+    let discount = parseFloat(document.getElementById('discount').value) || 0;
+    let weight = parseFloat($('#return_weight').val()) || 0;
+
+    let total = price - (price * discount / 100);
+
+    document.getElementById('total_price').value = (weight * total.toFixed(2));
+  }
 </script>
 @endsection

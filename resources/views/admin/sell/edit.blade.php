@@ -19,7 +19,7 @@
 
             @include('includes.flash_message')
 
-            {!! Form::model($sell, ['method'=>'PATCH', 'action'=> ['AdminDiamondController@sellUpdate', $sell->id],'files'=>true,'class'=>'form-horizontal', 'name'=>'editsellform']) !!}
+            {!! Form::model($sell, ['method'=>'PATCH', 'action'=> ['AdminDiamondController@sellUpdate', $sell->id],'files'=>true,'class'=>'form-horizontal', 'name'=>'editsellform', 'id' => 'sellEditForm']) !!}
             @csrf
 
             <input type="hidden" name="purchase_id" id="purchase_id" value="{{$sell->purchase_id}}">
@@ -34,7 +34,8 @@
 
                <div class="col-md-4 mb-2">
                   <label>Party Name</label>
-                  <select name="parties_id" class="form-control" required>
+                  <select name="parties_id" class="form-control">
+                     <option value="">Select Party</option>
                      @foreach($partys as $party)
                      <option value="{{$party->id}}" {{$party->id == $sell->parties_id ? 'selected' : '' }}>{{$party->fname}} - {{$party->lname}}</option>
                      @endforeach
@@ -66,6 +67,7 @@
                <div class="col-md-4 mb-2">
                   <label>Broker Name</label>
                   <select name="broker_id" class="form-control">
+                     <option value="">Select Broker</option>
                      @foreach($brokers as $broker)
                      <option value="{{$broker->id}}" {{$broker->id == $sell->broker_id ? 'selected' : '' }}>{{$broker->fname}} - {{$broker->lname}}</option>
                      @endforeach
@@ -160,9 +162,9 @@
             final_amount: {
                required: true,
             },
-            parties_id: {
-               required: true,
-            },
+            // parties_id: {
+            //    required: true,
+            // },
             payment_type: {
                required: true,
             },
@@ -212,6 +214,19 @@
       '#pWeight, #rate_per_ct, #dollar_rate, #less_brokerage'
    ).forEach(el => {
       el.addEventListener('input', calculateAmounts);
+   });
+
+   document.getElementById('sellEditForm').addEventListener('submit', function(e) {
+
+      let party = document.querySelector('[name="parties_id"]').value;
+      let broker = document.querySelector('[name="broker_id"]').value;
+
+      if (!party && !broker) {
+         e.preventDefault(); // form submit rok do
+         // alert('Please select at least Party or Broker.');
+         showAlert('Please select at least Party or Broker.', 'danger');
+         return false;
+      }
    });
 </script>
 @endsection

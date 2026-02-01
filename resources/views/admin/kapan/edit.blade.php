@@ -38,8 +38,15 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="kapan_weight">kapan Weight</label>
-                            <input type="number" name="kapan_weight" class="form-control" id="kapan_weight"
-                                placeholder="00.00" value="{{ $kapan->kapan_weight }}" oninput="formatWeight(this);" required>
+                            <input type="text"
+                                name="kapan_weight"
+                                class="form-control"
+                                id="kapan_weight"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="{{ $kapan->kapan_weight }}"
+                                required>
                             @if ($errors->has('kapan_weight'))
                             <div class="error text-danger">{{ $errors->first('kapan_weight') }}</div>
                             @endif
@@ -48,8 +55,16 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="kapan_quantity">kapan Quantity</label>
-                            <input type="number" name="kapan_quantity" class="form-control" id="kapan_quantity"
-                                placeholder="0" value="{{ $kapan->kapan_quantity }}" required>
+                            <input type="number"
+                                name="kapan_quantity"
+                                class="form-control"
+                                id="kapan_quantity"
+                                placeholder="0"
+                                step="1"
+                                min="0"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                value="{{ $kapan->kapan_quantity }}"
+                                required>
                             @if ($errors->has('kapan_quantity'))
                             <div class="error text-danger">{{ $errors->first('kapan_quantity') }}</div>
                             @endif
@@ -79,14 +94,21 @@
         $("form[name='editkapanform']").validate({
             rules: {
                 kapan_name: {
-                    required: true,
+                    required: true
                 },
                 kapan_weight: {
                     required: true,
+                    number: true
                 },
                 kapan_quantity: {
                     required: true,
-                },
+                    digits: true
+                }
+            },
+            messages: {
+                kapan_quantity: {
+                    digits: "Please enter a whole number"
+                }
             },
             submitHandler: function(form) {
                 form.submit();
@@ -96,14 +118,19 @@
 </script>
 <script>
     function formatWeight(input) {
-        // Remove any non-numeric characters
-        var cleanedValue = input.value.replace(/[^0-9.]/g, '');
+        let value = input.value.replace(/[^0-9.]/g, '');
 
-        // Ensure valid pattern: either empty, '0.00', or '00.00'
-        var match = cleanedValue.match(/^(\d{0,4}(\.\d{0,2})?)?$/);
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts[1];
+        }
 
-        // Update the input value with the formatted result
-        input.value = match ? match[1] || '' : '';
+        if (parts[1]) {
+            parts[1] = parts[1].substring(0, 2);
+            value = parts.join('.');
+        }
+
+        input.value = value;
     }
 </script>
 @endsection

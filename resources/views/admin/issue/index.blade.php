@@ -170,7 +170,7 @@
         </form>
       </div>
     </div>
-    @elseif(request()->designation != '')
+    @elseif(request()->kapans_id != '')
     <div class="row">
       <div class="col-lg-12">
         <div class="card">

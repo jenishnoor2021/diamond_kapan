@@ -346,11 +346,29 @@ class AdminDiamondController extends Controller
         return Redirect::back()->with('success', "Delete Record Successfully");
     }
 
-    public function purchase()
+    public function purchase(Request $request)
     {
-        $purchases = Purchase::where('is_sell', 0)->get();
+        $query = Purchase::where('is_sell', 0);
+
+        if ($request->status == 'certi') {
+            $query->whereHas('diamond.issues', function ($q) {
+                $q->where('designation_id', 3)
+                    ->where('is_non_certi', 0);
+            });
+        }
+
+        if ($request->status == 'non_certi') {
+            $query->whereHas('diamond.issues', function ($q) {
+                $q->where('designation_id', 3)
+                    ->where('is_non_certi', 1);
+            });
+        }
+
+        $purchases = $query->get();
+
         $partys = Party::where('type', 'party')->where('is_active', 1)->get();
         $brokers = Party::where('type', 'broker')->where('is_active', 1)->get();
+
         return view('admin.diamond.purchase', compact('purchases', 'partys', 'brokers'));
     }
 
@@ -363,7 +381,7 @@ class AdminDiamondController extends Controller
         $polish = Polish::get();
         $symmetry = Symmetry::get();
 
-        $Purchase = Purchase::findOrFail($id);
+        $Purchase = Purchase::with('diamond')->findOrFail($id);
         if (!$Purchase) {
             return Redirect::back()->with('error', "Invalid id");
         }
@@ -386,16 +404,38 @@ class AdminDiamondController extends Controller
 
     public function purchaseUpdate(Request $request, $id)
     {
-        $issue = Issue::findOrFail($id);
-        $input = $request->all();
+        $request->validate([
+            'return_weight' => 'required|numeric|min:0',
+            'return_date'   => 'required|date',
+        ]);
 
+        $issue = Issue::findOrFail($id);
         $diamond = Diamond::where('id', $issue->diamonds_id)->first();
 
-        if ($issue->designation_id == 3 && !empty($request->certi_no)) {
+        $data = $request->except(['_token', '_method']);
+
+        // ✅ Reverse checkbox logic
+        $data['is_non_certi'] = $request->has('is_non_certi') ? 0 : 1;
+
+        // ✅ Discount Calculation
+        $weight   = $request->return_weight ?? 0;
+        $price    = $request->price ?? 0;
+        $discount = $request->discount ?? 0;
+
+        $baseAmount = $weight * $price;
+
+        $totalPrice = $discount > 0
+            ? $baseAmount - ($baseAmount * $discount / 100)
+            : $baseAmount;
+
+        $data['total_price'] = $totalPrice;
+
+        // ✅ Update Issue
+        $issue->update($data);
+
+        if ($issue->designation_id == 3 && $data['is_non_certi'] == 0) {
             $diamond->update(['status' => 'purchased']);
         }
-
-        $issue->update($input);
 
         return redirect('admin/purchase')->with('success', 'updated successfully');
     }
@@ -409,12 +449,16 @@ class AdminDiamondController extends Controller
             'total_amount'    => 'required|numeric',
             'less_brokerage'  => 'nullable|numeric',
             'final_amount'    => 'required|numeric',
-            'parties_id'      => 'nullable|numeric',
+            'parties_id' => 'nullable|numeric|required_without:broker_id',
+            'broker_id'  => 'nullable|numeric|required_without:parties_id',
             'payment_type'   => 'required|string',
             'payment_status'  => 'required|in:paid,unpaid',
             'sell_date'       => 'required|date',
             'dollar_rate'     => 'required|numeric',
             // 'note'       => 'required|string',
+        ], [
+            'parties_id.required_without' => 'Either Party or Broker must be selected.',
+            'broker_id.required_without'  => 'Either Party or Broker must be selected.',
         ]);
 
         $alreadySold = Sell::where('purchase_id', $request->purchase_id)
@@ -479,11 +523,11 @@ class AdminDiamondController extends Controller
     }
 
 
-    public function export()
+    public function export(Request $request)
     {
         return Excel::download(
-            new PurchaseDiamondsExport,
-            'purchased_diamonds_' . now()->format('d-m-Y') . '.xlsx'
+            new PurchaseDiamondsExport($request->status),
+            'Abhinandan Gems CVD ' . now()->format('d-m-Y') . '.xlsx'
         );
     }
 }

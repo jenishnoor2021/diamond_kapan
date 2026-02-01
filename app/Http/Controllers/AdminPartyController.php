@@ -43,7 +43,7 @@ class AdminPartyController extends Controller
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'lname' => 'required',
-            'party_code' => 'required',
+            // 'party_code' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -97,7 +97,7 @@ class AdminPartyController extends Controller
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'lname' => 'required',
-            'party_code' => 'required',
+            // 'party_code' => 'required',
         ]);
 
         if ($validator->fails()) {

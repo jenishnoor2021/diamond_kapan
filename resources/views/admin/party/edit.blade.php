@@ -53,7 +53,7 @@
                <div class="col-md-3">
                   <div class="mb-3">
                      <label for="party_code">Party Code</label>
-                     <input type="text" name="party_code" class="form-control" id="party_code" placeholder="Enter party code" onkeypress='return (event.charCode != 32)' value="{{$party->party_code}}" required>
+                     <input type="text" name="party_code" class="form-control" id="party_code" placeholder="Enter party code" onkeypress='return (event.charCode != 32)' value="{{$party->party_code}}">
                      @if($errors->has('party_code'))
                      <div class="error text-danger">{{ $errors->first('party_code') }}</div>
                      @endif

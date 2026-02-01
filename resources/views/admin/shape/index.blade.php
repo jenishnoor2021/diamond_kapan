@@ -36,7 +36,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="shape_type" class="form-label">Type</label>
-                                    <input type="text" name="shape_type" class="form-control" id="shape_type" placeholder="Enter type" value="{{ old('shape_type') }}" onkeypress='return (event.charCode != 32)' required>
+                                    <input type="text" name="shape_type" class="form-control" id="shape_type" placeholder="Enter type" value="{{ old('shape_type') }}" required>
                                     @if($errors->has('shape_type'))
                                     <div class="error text-danger">{{ $errors->first('shape_type') }}</div>
                                     @endif

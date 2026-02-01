@@ -218,13 +218,27 @@ class AdminIssueController extends Controller
 
         $diamond = Diamond::where('id', $issue->diamonds_id)->first();
 
-        if ($request->return_weight > $diamond->prediction_weight) {
-            return back()->with('error', 'Return weight cannot be greater than diamond weight');
-        }
+        // if ($request->return_weight > $diamond->prediction_weight) {
+        //     return back()->with('error', 'Return weight cannot be greater than diamond weight');
+        // }
 
         $data = $request->except(['issue_id', '_token']);
         $data['is_return'] = 1;
-        $data['total_price'] = $request->return_weight * $request->price;
+        $data['is_non_certi'] = $request->has('is_non_certi') ? 0 : 1;
+
+        $weight = $request->return_weight ?? 0;
+        $price  = $request->price ?? 0;
+        $discount = $request->discount ?? 0;
+
+        $baseAmount = $weight * $price;
+
+        if ($discount > 0) {
+            $totalPrice = $baseAmount - ($baseAmount * $discount / 100);
+        } else {
+            $totalPrice = $baseAmount;
+        }
+
+        $data['total_price'] = $totalPrice;
 
         $issue->update($data);
 
@@ -238,7 +252,8 @@ class AdminIssueController extends Controller
         //     'certi_no'     => $request->certi_no ?? NULL,
         // ]);
 
-        if ($issue->designation_id == 3 && !empty($request->certi_no)) {
+        // if ($issue->designation_id == 3 && !empty($request->certi_no)) {
+        if ($issue->designation_id == 3) {
             $diamond->update(['status' => 'purchased']);
 
             Purchase::firstOrCreate([

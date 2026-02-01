@@ -22,12 +22,33 @@ use App\Models\Issue;
 
                 @include('includes.flash_message')
 
-                <div id="right">
+                <!-- <div id="right">
                     <div id="menu" class="mb-3">
                         <a href="{{ route('admin.purchase.export') }}"
                             class="btn btn-success btn-sm">
                             <i class="fa fa-download"></i> Export
                         </a>
+                    </div>
+                </div> -->
+
+                <div id="right">
+                    <div id="menu" class="mb-3 d-flex gap-2">
+
+                        <form method="GET" action="{{ route('admin.purchase.index') }}" class="d-flex gap-2">
+
+                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="">All</option>
+                                <option value="certi" {{ request('status') == 'certi' ? 'selected' : '' }}>Certified</option>
+                                <option value="non_certi" {{ request('status') == 'non_certi' ? 'selected' : '' }}>Non Certified</option>
+                            </select>
+
+                        </form>
+
+                        <a href="{{ route('admin.purchase.export', ['status' => request('status')]) }}"
+                            class="btn btn-success btn-sm">
+                            <i class="fa fa-download"></i> Export
+                        </a>
+
                     </div>
                 </div>
 
@@ -36,6 +57,7 @@ use App\Models\Issue;
                         <tr>
                             <th>Action</th>
                             <th>Diamond Name</th>
+                            <th>Diamond Status</th>
                         </tr>
                     </thead>
 
@@ -44,9 +66,11 @@ use App\Models\Issue;
 
                         <?php
                         $cRWeight = 0;
+                        $status = '';
                         $certiReturn = Issue::where('designation_id', 3)->where('diamonds_id', $purchase->diamonds_id)->first();
                         if ($certiReturn) {
                             $cRWeight = $certiReturn->return_weight;
+                            $status = $certiReturn->is_non_certi ? 'Non Certi' : 'Certi';
                         }
                         ?>
                         <tr>
@@ -64,6 +88,13 @@ use App\Models\Issue;
                                 </button>
                             </td>
                             <td>{{ $purchase->diamond->diamond_name }}</td>
+                            <td>
+                                @if($status)
+                                <span class="badge {{ $status === 'Non Certi' ? 'bg-danger' : 'bg-success' }}">
+                                    {{ $status }}
+                                </span>
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -77,7 +108,7 @@ use App\Models\Issue;
 
 <div class="modal fade" id="sellModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <form method="POST" action="{{ route('admin.sell.store') }}">
+        <form method="POST" action="{{ route('admin.sell.store') }}" id="sellForm">
             @csrf
 
             <input type="hidden" name="purchase_id" id="purchase_id">
@@ -100,7 +131,8 @@ use App\Models\Issue;
 
                         <div class="col-md-4 mb-2">
                             <label>Party Name</label>
-                            <select name="parties_id" class="form-control" required>
+                            <select name="parties_id" class="form-control">
+                                <option value="">Select Party</option>
                                 @foreach($partys as $party)
                                 <option value="{{$party->id}}">{{$party->fname}} - {{$party->lname}}</option>
                                 @endforeach
@@ -132,6 +164,7 @@ use App\Models\Issue;
                         <div class="col-md-4 mb-2">
                             <label>Broker Name</label>
                             <select name="broker_id" class="form-control">
+                                <option value="">Select Broker</option>
                                 @foreach($brokers as $broker)
                                 <option value="{{$broker->id}}">{{$broker->fname}} - {{$broker->lname}}</option>
                                 @endforeach
@@ -140,7 +173,7 @@ use App\Models\Issue;
 
                         <div class="col-md-4 mb-2">
                             <label>Brokerage (%)</label>
-                            <input type="number" step="0.01" name="less_brokerage" id="less_brokerage" class="form-control" required>
+                            <input type="number" step="0.01" name="less_brokerage" id="less_brokerage" class="form-control">
                         </div>
 
                         <!-- brokerage_amount = final_amount * less_brokerage  / for ex. 18000* 2% = 360  -->
@@ -205,7 +238,7 @@ use App\Models\Issue;
 
 @section('script')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    <?php /*document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.sellBtn').forEach(button => {
             button.addEventListener('click', function() {
                 document.getElementById('purchase_id').value = this.dataset.id;
@@ -214,6 +247,34 @@ use App\Models\Issue;
                 document.getElementById('pWeight').value = this.dataset.pweight;
             });
         });
+    }); */ ?>
+    document.addEventListener('click', function(e) {
+
+        if (e.target.closest('.sellBtn')) {
+
+            let button = e.target.closest('.sellBtn');
+
+            document.getElementById('purchase_id').value = button.dataset.id;
+            document.getElementById('diamonds_id').value = button.dataset.diamonds_id;
+            document.getElementById('dName').innerHTML = button.dataset.name;
+            document.getElementById('pWeight').value = button.dataset.pweight;
+
+            // calculation trigger kar do
+            calculateAmounts();
+        }
+    });
+    document.getElementById('sellForm').addEventListener('submit', function(e) {
+
+        let party = document.querySelector('[name="parties_id"]').value;
+        let broker = document.querySelector('[name="broker_id"]').value;
+
+        if (!party && !broker) {
+            e.preventDefault(); // form submit rok do
+            // alert('Please select at least Party or Broker.');
+            showAlert('Please select at least Party or Broker.', 'danger');
+            return false;
+        }
+
     });
 </script>
 
@@ -233,9 +294,15 @@ use App\Models\Issue;
         let finalAmount = weightXrate * dollarRate;
         document.getElementById('final_amount').value = finalAmount.toFixed(2);
 
-        // 3. Brokerage Amount
-        let brokerageAmount = (finalAmount * brokeragePer) / 100;
-        document.getElementById('brokerage_amount').value = brokerageAmount.toFixed(2);
+        let brokerageAmount = 0;
+
+        // 3. Brokerage Amount (Only if % > 0)
+        if (brokeragePer > 0) {
+            brokerageAmount = (finalAmount * brokeragePer) / 100;
+            document.getElementById('brokerage_amount').value = brokerageAmount.toFixed(2);
+        } else {
+            document.getElementById('brokerage_amount').value = finalAmount;
+        }
 
         // 4. Income Amount
         let totalAmount = finalAmount - brokerageAmount;

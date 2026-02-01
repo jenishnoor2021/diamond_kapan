@@ -31,10 +31,12 @@ class CreateIssuesTable extends Migration
             $table->string('r_cut')->nullable();
             $table->string('r_polish')->nullable();
             $table->string('r_symmetry')->nullable();
+            $table->boolean('is_non_certi')->default(0);
             $table->string('certi_no')->nullable();
             $table->string('Certificate_url')->nullable();
             $table->string('availability')->nullable();
             $table->string('price')->nullable();
+            $table->string('discount')->nullable();
             $table->string('total_price')->nullable();
             $table->string('image_link')->nullable();
             $table->string('video_link')->nullable();
@@ -44,6 +46,9 @@ class CreateIssuesTable extends Migration
             $table->string('lab')->nullable();
             $table->string('measurements')->nullable();
             $table->string('bgm')->nullable();
+            $table->string('fancy_color')->nullable();
+            $table->string('fancy_color_intensity')->nullable();
+            $table->string('cut_grade')->nullable();
             $table->string('h_and_a')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();

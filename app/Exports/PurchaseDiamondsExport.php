@@ -21,26 +21,63 @@ class PurchaseDiamondsExport implements
     WithColumnFormatting,
     WithEvents
 {
+    protected $status;
+
+    public function __construct($status = null)
+    {
+        $this->status = $status;
+    }
     /**
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return Purchase::where('is_sell', 0)
+        $query = Purchase::where('is_sell', 0)
             ->whereHas('diamond.issues', function ($q) {
+
                 $q->where('designation_id', 3);
+
+                if ($this->status == 'certi') {
+                    $q->where('is_non_certi', 0);
+                }
+
+                if ($this->status == 'non_certi') {
+                    $q->where('is_non_certi', 1);
+                }
             })
             ->with([
                 'diamond',
                 'diamond.issues' => function ($q) {
+
                     $q->where('designation_id', 3);
+
+                    if ($this->status == 'certi') {
+                        $q->where('is_non_certi', 0);
+                    }
+
+                    if ($this->status == 'non_certi') {
+                        $q->where('is_non_certi', 1);
+                    }
+
+                    $q->orderBy('r_shape', 'ASC')
+                        ->orderBy('return_weight', 'ASC');
                 }
-            ])
-            ->get()
+            ]);
+
+        return $query->get()
+            ->sortBy(function ($purchase) {
+                $issue = $purchase->diamond->issues->first();
+                return ($issue->r_shape ?? '') . '-' . ($issue->return_weight ?? 0);
+            })
+            ->values()
             ->map(function ($purchase) {
 
                 $diamond = $purchase->diamond;
-                $issue   = $diamond->issues->first(); // designation 3 issue
+                $issue   = $diamond->issues->first();
+
+                if (!$issue) {
+                    return null; // safety
+                }
 
                 return [
                     'Stock #' => $diamond->diamond_name ?? '',
@@ -49,15 +86,15 @@ class PurchaseDiamondsExport implements
                     'weight' => $issue->return_weight ?? 0,
                     'clarity' => $issue->r_clarity ?? '',
                     'color' => $issue->r_color ?? '',
-                    'fancy_color' => '',
-                    'fancy_color_intensity' => '',
+                    'fancy_color' => $issue->fancy_color ?? '',
+                    'fancy_color_intensity' => $issue->fancy_color_intensity ?? '',
                     'fancy_color_overtone' => '',
-                    'price' => $issue->price ?? 0,
+                    'price' => isset($issue->price) ? round($issue->price) : 0,
                     'total_price' => $issue->total_price ?? 0,
                     'discount_percent' => '',
                     'image_link' => $issue->image_link ?? '',
                     'video_link' => $issue->video_link ?? '',
-                    'cut_grade' => '',
+                    'cut_grade' => $issue->cut_grade ?? '',
                     'polish' => $issue->r_polish ?? '',
                     'symmetry' => $issue->r_symmetry ?? '',
                     'depth_percent' => $issue->depth_percent ?? 0,
@@ -120,7 +157,9 @@ class PurchaseDiamondsExport implements
                     // 'Cert No'      => $issue->certi_no ?? '',
                     // 'Status'       => $purchase->is_sell ? 'Sold' : 'Available',
                 ];
-            });
+            })
+            ->filter()
+            ->values();
     }
 
     public function headings(): array
@@ -221,6 +260,25 @@ class PurchaseDiamondsExport implements
             AfterSheet::class => function (AfterSheet $event) {
 
                 $sheet = $event->sheet->getDelegate();
+                $highestRow = $sheet->getHighestRow();
+
+                for ($row = 2; $row <= $highestRow; $row++) {
+
+                    $cell = 'X' . $row; // Certificate Url column
+
+                    $url = $sheet->getCell($cell)->getValue();
+
+                    if (!empty($url)) {
+                        $sheet->getCell($cell)->getHyperlink()->setUrl($url);
+
+                        $sheet->getStyle($cell)->applyFromArray([
+                            'font' => [
+                                'color' => ['rgb' => '0000FF'],
+                                'underline' => true,
+                            ],
+                        ]);
+                    }
+                }
 
                 // Auto-size all columns
                 // foreach (range('A', $sheet->getHighestColumn()) as $col) {

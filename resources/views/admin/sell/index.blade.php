@@ -41,7 +41,7 @@
                                 <a href="{{ route('admin.sell.edit', $sell->id) }}" class="btn btn-outline-primary waves-effect waves-light"><i class="fa fa-edit"></i></a>
                             </td>
                             <td>{{ $sell->diamond->diamond_name }}</td>
-                            <td>{{ $sell->party->fname }}</td>
+                            <td>{{ $sell->party?->fname }}</td>
                             <td>{{ $sell->final_amount }}</td>
                             <td>{{ $sell->payment_status }}</td>
                         </tr>
