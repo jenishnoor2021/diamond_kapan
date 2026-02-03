@@ -522,6 +522,13 @@ class AdminDiamondController extends Controller
         return redirect('admin/sell')->with('success', 'updated successfully');
     }
 
+    public function sellDestroy($id)
+    {
+        $sell = Sell::findOrFail($id);
+        Purchase::where('id', $sell->purchase_id)->update(['is_sell' => 0]);
+        $sell->delete();
+        return Redirect::back()->with('success', "Delete Record Successfully");
+    }
 
     public function export(Request $request)
     {

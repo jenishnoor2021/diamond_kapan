@@ -208,6 +208,7 @@ Route::group(['middleware' => ['auth', 'usersession']], function () {
     Route::get("admin/sell", [AdminDiamondController::class, 'sellList'])->name('admin.sell.index');
     Route::get('admin/sell/edit/{id}', [AdminDiamondController::class, 'sellEdit'])->name('admin.sell.edit');
     Route::patch('admin/sell/update/{id}', [AdminDiamondController::class, 'sellUpdate'])->name('admin.sell.update');
+    Route::get('admin/sell/destroy/{id}', [AdminDiamondController::class, 'sellDestroy'])->name('admin.sell.destroy');
 
 
     Route::get("admin/party", [AdminPartyController::class, 'index'])->name('admin.party.index');

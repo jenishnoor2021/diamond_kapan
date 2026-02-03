@@ -39,6 +39,10 @@
                         <tr>
                             <td>
                                 <a href="{{ route('admin.sell.edit', $sell->id) }}" class="btn btn-outline-primary waves-effect waves-light"><i class="fa fa-edit"></i></a>
+                                <a href="{{ route('admin.sell.destroy', $sell->id) }}"
+                                    onclick="return confirm('Sure ! You want to delete ?');"
+                                    class="btn btn-outline-danger waves-effect waves-light"><i
+                                        class="fa fa-trash"></i></a>
                             </td>
                             <td>{{ $sell->diamond->diamond_name }}</td>
                             <td>{{ $sell->party?->fname }}</td>
