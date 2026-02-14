@@ -30,6 +30,7 @@
                             <th>Diamond Name</th>
                             <th>Party</th>
                             <th>Broker</th>
+                            <th>Mobile</th>
                             <th>Final Rate</th>
                             <th>Status</th>
                         </tr>
@@ -48,6 +49,7 @@
                             <td>{{ $sell->diamond->diamond_name }}</td>
                             <td>{{ $sell->parties_name }}</td>
                             <td>{{ $sell->broker_name }}</td>
+                            <td>{{ $sell->mobile_no }}</td>
                             <td>{{ $sell->final_amount }}</td>
                             <td>{{ $sell->payment_status }}</td>
                         </tr>

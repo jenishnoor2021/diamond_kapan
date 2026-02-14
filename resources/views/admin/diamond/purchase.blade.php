@@ -145,6 +145,11 @@ use App\Models\Issue;
                         </div>
 
                         <div class="col-md-4 mb-2">
+                            <label>mobile no</label>
+                            <input type="text" name="mobile_no" id="mobile_no" class="form-control">
+                        </div>
+
+                        <div class="col-md-4 mb-2">
                             <label>Ct Rate ($)</label>
                             <input type="number" step="0.01" name="rate_per_ct" id="rate_per_ct" class="form-control" required>
                         </div>

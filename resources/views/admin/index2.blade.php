@@ -158,7 +158,7 @@
                             <tr>
                                 <th>Party</th>
                                 <th>Broker</th>
-                                <!-- <th>Mobile</th> -->
+                                <th>Mobile</th>
                                 <th>Dimond Name</th>
                                 <th>Amount</th>
                                 <th>Sell Date</th>
@@ -170,7 +170,7 @@
                             <tr>
                                 <td>{{$todaylist->parties_name}}</td>
                                 <td>{{$todaylist->broker_name}}</td>
-                                <!-- <td>{{$todaylist->party?->mobile}}</td> -->
+                                <td>{{$todaylist->mobile_no}}</td>
                                 <td>{{$todaylist->diamond->diamond_name}}</td>
                                 <td>{{$todaylist->total_amount}}</td>
                                 <td>{{ \Carbon\Carbon::parse($todaylist->sell_date)->format('d-m-Y') }}</td>
@@ -200,7 +200,7 @@
                             <tr>
                                 <th>Party</th>
                                 <th>Broker</th>
-                                <!-- <th>Mobile</th> -->
+                                <th>Mobile</th>
                                 <th>Dimond Name</th>
                                 <th>Amount</th>
                                 <th>Sell Date</th>
@@ -212,7 +212,7 @@
                             <tr>
                                 <td>{{$tomorrowlist->parties_name}}</td>
                                 <td>{{$tomorrowlist->broker_name}}</td>
-                                <!-- <td>{{$tomorrowlist->party?->mobile}}</td> -->
+                                <td>{{$tomorrowlist->mobile_no}}</td>
                                 <td>{{$tomorrowlist->diamond->diamond_name}}</td>
                                 <td>{{$tomorrowlist->total_amount}}</td>
                                 <td>{{ \Carbon\Carbon::parse($tomorrowlist->sell_date)->format('d-m-Y') }}</td>
@@ -242,7 +242,7 @@
                             <tr>
                                 <th>Party</th>
                                 <th>Broker</th>
-                                <!-- <th>Mobile</th> -->
+                                <th>Mobile</th>
                                 <th>Dimond Name</th>
                                 <th>Amount</th>
                                 <th>Sell Date</th>
@@ -254,7 +254,7 @@
                             <tr>
                                 <td>{{$outdatedlist->parties_name}}</td>
                                 <td>{{$outdatedlist->broker_name}}</td>
-                                <!-- <td>{{$outdatedlist->party?->mobile}}</td> -->
+                                <td>{{$outdatedlist->mobile_no}}</td>
                                 <td>{{$outdatedlist->diamond->diamond_name}}</td>
                                 <td>{{$outdatedlist->total_amount}}</td>
                                 <td>{{ \Carbon\Carbon::parse($outdatedlist->sell_date)->format('d-m-Y') }}</td>

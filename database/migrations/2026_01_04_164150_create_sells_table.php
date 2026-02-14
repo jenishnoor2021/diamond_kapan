@@ -34,6 +34,7 @@ class CreateSellsTable extends Migration
 
             $table->string('broker_id')->nullable();
             $table->string('broker_name')->nullable();
+            $table->string('mobile_no')->nullable();
 
             $table->date('sell_date')->nullable();
             $table->date('due_date')->nullable();

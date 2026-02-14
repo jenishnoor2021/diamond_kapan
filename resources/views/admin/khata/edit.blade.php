@@ -5,7 +5,7 @@
 <div class="row">
    <div class="col-12">
       <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-         <h4 class="mb-sm-0 font-size-18">Edit Party</h4>
+         <h4 class="mb-sm-0 font-size-18">Edit Khata</h4>
       </div>
    </div>
 </div>
@@ -75,7 +75,7 @@
 
             <div class="d-flex gap-2">
                <button type="submit" class="btn btn-primary w-md">Update</button>
-               <a class="btn btn-light w-md" href="{{ URL::to('/admin/party') }}">Back</a>
+               <a class="btn btn-light w-md" href="{{ URL::to('/admin/khata') }}">Back</a>
             </div>
             </form>
          </div>
