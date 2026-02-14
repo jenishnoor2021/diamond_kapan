@@ -83,12 +83,12 @@
                 </a>
             </li>
 
-            <li>
+            <!-- <li>
                 <a href="/admin/party" class="waves-effect">
                     <i class="bx bx-group"></i>
                     <span>Party / Broker</span>
                 </a>
-            </li>
+            </li> -->
 
             <li>
                 <a href="/admin/khata" class="waves-effect">

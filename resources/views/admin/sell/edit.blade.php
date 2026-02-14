@@ -32,7 +32,7 @@
                   <input type="number" step="0.01" name="pWeight" id="pWeight" value="{{$diamond->prediction_weight}}" class="form-control" disabled>
                </div>
 
-               <div class="col-md-4 mb-2">
+               <!-- <div class="col-md-4 mb-2">
                   <label>Party Name</label>
                   <select name="parties_id" class="form-control">
                      <option value="">Select Party</option>
@@ -40,6 +40,11 @@
                      <option value="{{$party->id}}" {{$party->id == $sell->parties_id ? 'selected' : '' }}>{{$party->fname}} - {{$party->lname}}</option>
                      @endforeach
                   </select>
+               </div> -->
+
+               <div class="col-md-4 mb-2">
+                  <label>Party Name</label>
+                  <input type="text" name="parties_name" id="parties_name" class="form-control" value="{{$sell->parties_name}}">
                </div>
 
                <div class="col-md-4 mb-2">
@@ -64,7 +69,7 @@
                   <input type="number" step="0.01" name="final_amount" id="final_amount" class="form-control" value="{{$sell->final_amount}}" style="background-color:#f8f8fb" required readonly>
                </div>
 
-               <div class="col-md-4 mb-2">
+               <!-- <div class="col-md-4 mb-2">
                   <label>Broker Name</label>
                   <select name="broker_id" class="form-control">
                      <option value="">Select Broker</option>
@@ -72,11 +77,16 @@
                      <option value="{{$broker->id}}" {{$broker->id == $sell->broker_id ? 'selected' : '' }}>{{$broker->fname}} - {{$broker->lname}}</option>
                      @endforeach
                   </select>
+               </div> -->
+
+               <div class="col-md-4 mb-2">
+                  <label>Broker Name</label>
+                  <input type="text" name="broker_name" id="broker_name" class="form-control" value="{{$sell->broker_name}}">
                </div>
 
                <div class="col-md-4 mb-2">
                   <label>Brokerage (%)</label>
-                  <input type="number" step="0.01" name="less_brokerage" id="less_brokerage" value="{{$sell->less_brokerage}}" class="form-control" required>
+                  <input type="number" step="0.01" name="less_brokerage" id="less_brokerage" value="{{$sell->less_brokerage}}" class="form-control">
                </div>
 
                <!-- brokerage_amount = final_amount * less_brokerage  / for ex. 18000* 2% = 360  -->
@@ -218,13 +228,16 @@
 
    document.getElementById('sellEditForm').addEventListener('submit', function(e) {
 
-      let party = document.querySelector('[name="parties_id"]').value;
-      let broker = document.querySelector('[name="broker_id"]').value;
+      // let party = document.querySelector('[name="parties_id"]').value;
+      // let broker = document.querySelector('[name="broker_id"]').value;
+
+      let party = document.querySelector('[name="parties_name"]').value;
+      let broker = document.querySelector('[name="broker_name"]').value;
 
       if (!party && !broker) {
          e.preventDefault(); // form submit rok do
          // alert('Please select at least Party or Broker.');
-         showAlert('Please select at least Party or Broker.', 'danger');
+         showAlert('Please enter at least Party or Broker.', 'danger');
          return false;
       }
    });

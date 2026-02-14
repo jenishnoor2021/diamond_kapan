@@ -121,6 +121,11 @@ class AdminKhataController extends Controller
     public function destroy($id)
     {
         $khata = Khata::findOrFail($id);
+
+        $khata->incomes()->delete();
+        $khata->khataBills()->delete();
+        $khata->expenses()->delete();
+
         $khata->delete();
         return Redirect::back()->with('success', "Delete Record Successfully");
     }

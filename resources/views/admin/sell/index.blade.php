@@ -28,7 +28,8 @@
                         <tr>
                             <th>Action</th>
                             <th>Diamond Name</th>
-                            <th>Party Name</th>
+                            <th>Party</th>
+                            <th>Broker</th>
                             <th>Final Rate</th>
                             <th>Status</th>
                         </tr>
@@ -45,7 +46,8 @@
                                         class="fa fa-trash"></i></a>
                             </td>
                             <td>{{ $sell->diamond->diamond_name }}</td>
-                            <td>{{ $sell->party?->fname }}</td>
+                            <td>{{ $sell->parties_name }}</td>
+                            <td>{{ $sell->broker_name }}</td>
                             <td>{{ $sell->final_amount }}</td>
                             <td>{{ $sell->payment_status }}</td>
                         </tr>

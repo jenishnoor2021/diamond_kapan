@@ -449,16 +449,18 @@ class AdminDiamondController extends Controller
             'total_amount'    => 'required|numeric',
             'less_brokerage'  => 'nullable|numeric',
             'final_amount'    => 'required|numeric',
-            'parties_id' => 'nullable|numeric|required_without:broker_id',
-            'broker_id'  => 'nullable|numeric|required_without:parties_id',
+            // 'parties_id' => 'nullable|numeric|required_without:broker_id',
+            // 'broker_id'  => 'nullable|numeric|required_without:parties_id',
+            'parties_name' => 'nullable|string|required_without:broker_name',
+            'broker_name'  => 'nullable|string|required_without:parties_name',
             'payment_type'   => 'required|string',
             'payment_status'  => 'required|in:paid,unpaid',
             'sell_date'       => 'required|date',
             'dollar_rate'     => 'required|numeric',
             // 'note'       => 'required|string',
         ], [
-            'parties_id.required_without' => 'Either Party or Broker must be selected.',
-            'broker_id.required_without'  => 'Either Party or Broker must be selected.',
+            'parties_name.required_without' => 'Either Party or Broker must be selected.',
+            'broker_name.required_without'  => 'Either Party or Broker must be selected.',
         ]);
 
         $alreadySold = Sell::where('purchase_id', $request->purchase_id)
@@ -505,7 +507,10 @@ class AdminDiamondController extends Controller
             'total_amount'    => 'required|numeric',
             'less_brokerage'  => 'nullable|numeric',
             'final_amount'    => 'required|numeric',
-            'parties_id'      => 'nullable|numeric',
+            // 'parties_id'      => 'nullable|numeric|required_without:broker_id',
+            // 'broker_id'  => 'nullable|numeric|required_without:parties_id',
+            'parties_name' => 'nullable|string|required_without:broker_name',
+            'broker_name'  => 'nullable|string|required_without:parties_name',
             'payment_type'   => 'required|string',
             'payment_status'  => 'required|in:paid,unpaid',
             'sell_date'       => 'required|date',
@@ -536,5 +541,37 @@ class AdminDiamondController extends Controller
             new PurchaseDiamondsExport($request->status),
             'Abhinandan Gems CVD ' . now()->format('d-m-Y') . '.xlsx'
         );
+    }
+
+    public function updatePartyBrokerFieldvalue()
+    {
+        $sells = Sell::all();
+
+        foreach ($sells as $sell) {
+
+            // If Party Exists
+            if (!empty($sell->parties_id)) {
+
+                $party = Party::find($sell->parties_id);
+
+                if ($party) {
+                    $sell->parties_name = $party->fname . ' ' . $party->lname;
+                }
+            }
+
+            // If Broker Exists
+            if (!empty($sell->broker_id)) {
+
+                $broker = Party::find($sell->broker_id); // If broker is also in parties table
+
+                if ($broker) {
+                    $sell->broker_name = $broker->fname . ' ' . $broker->lname;
+                }
+            }
+
+            $sell->save();
+        }
+
+        return "Updated Successfully";
     }
 }

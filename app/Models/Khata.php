@@ -14,7 +14,7 @@ class Khata extends Model
 
     public function incomes()
     {
-        return $this->hasMay(Income::class);
+        return $this->hasMany(Income::class, 'khatas_id');
     }
 
     public function khatabills()

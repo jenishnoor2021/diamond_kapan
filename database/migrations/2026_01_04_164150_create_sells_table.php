@@ -28,10 +28,12 @@ class CreateSellsTable extends Migration
 
             // Extra Info
             $table->string('parties_id')->nullable();
+            $table->string('parties_name')->nullable();
             $table->string('payment_type'); // COD / Credit / Advance
             $table->enum('payment_status', ['paid', 'unpaid'])->default('unpaid');
 
             $table->string('broker_id')->nullable();
+            $table->string('broker_name')->nullable();
 
             $table->date('sell_date')->nullable();
             $table->date('due_date')->nullable();

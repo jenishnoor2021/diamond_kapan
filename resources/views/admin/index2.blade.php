@@ -156,8 +156,9 @@
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>Party Name</th>
-                                <th>Mobile</th>
+                                <th>Party</th>
+                                <th>Broker</th>
+                                <!-- <th>Mobile</th> -->
                                 <th>Dimond Name</th>
                                 <th>Amount</th>
                                 <th>Sell Date</th>
@@ -167,8 +168,9 @@
                         <tbody>
                             @foreach($todaylists as $todaylist)
                             <tr>
-                                <td>{{$todaylist->party->fname}}</td>
-                                <td>{{$todaylist->mobile}}</td>
+                                <td>{{$todaylist->parties_name}}</td>
+                                <td>{{$todaylist->broker_name}}</td>
+                                <!-- <td>{{$todaylist->party?->mobile}}</td> -->
                                 <td>{{$todaylist->diamond->diamond_name}}</td>
                                 <td>{{$todaylist->total_amount}}</td>
                                 <td>{{ \Carbon\Carbon::parse($todaylist->sell_date)->format('d-m-Y') }}</td>
@@ -196,8 +198,9 @@
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>Party Name</th>
-                                <th>Mobile</th>
+                                <th>Party</th>
+                                <th>Broker</th>
+                                <!-- <th>Mobile</th> -->
                                 <th>Dimond Name</th>
                                 <th>Amount</th>
                                 <th>Sell Date</th>
@@ -207,8 +210,9 @@
                         <tbody>
                             @foreach($tomorrowlists as $tomorrowlist)
                             <tr>
-                                <td>{{$tomorrowlist->party->fname}}</td>
-                                <td>{{$tomorrowlist->mobile}}</td>
+                                <td>{{$tomorrowlist->parties_name}}</td>
+                                <td>{{$tomorrowlist->broker_name}}</td>
+                                <!-- <td>{{$tomorrowlist->party?->mobile}}</td> -->
                                 <td>{{$tomorrowlist->diamond->diamond_name}}</td>
                                 <td>{{$tomorrowlist->total_amount}}</td>
                                 <td>{{ \Carbon\Carbon::parse($tomorrowlist->sell_date)->format('d-m-Y') }}</td>
@@ -236,8 +240,9 @@
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>Party Name</th>
-                                <th>Mobile</th>
+                                <th>Party</th>
+                                <th>Broker</th>
+                                <!-- <th>Mobile</th> -->
                                 <th>Dimond Name</th>
                                 <th>Amount</th>
                                 <th>Sell Date</th>
@@ -247,8 +252,9 @@
                         <tbody>
                             @foreach($outdatedlists as $outdatedlist)
                             <tr>
-                                <td>{{$outdatedlist->party->fname}}</td>
-                                <td>{{$outdatedlist->mobile}}</td>
+                                <td>{{$outdatedlist->parties_name}}</td>
+                                <td>{{$outdatedlist->broker_name}}</td>
+                                <!-- <td>{{$outdatedlist->party?->mobile}}</td> -->
                                 <td>{{$outdatedlist->diamond->diamond_name}}</td>
                                 <td>{{$outdatedlist->total_amount}}</td>
                                 <td>{{ \Carbon\Carbon::parse($outdatedlist->sell_date)->format('d-m-Y') }}</td>

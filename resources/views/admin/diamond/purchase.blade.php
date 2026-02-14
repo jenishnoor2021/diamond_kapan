@@ -129,7 +129,7 @@ use App\Models\Issue;
                             <input type="number" step="0.01" name="pWeight" id="pWeight" class="form-control" disabled>
                         </div>
 
-                        <div class="col-md-4 mb-2">
+                        <!-- <div class="col-md-4 mb-2">
                             <label>Party Name</label>
                             <select name="parties_id" class="form-control">
                                 <option value="">Select Party</option>
@@ -137,6 +137,11 @@ use App\Models\Issue;
                                 <option value="{{$party->id}}">{{$party->fname}} - {{$party->lname}}</option>
                                 @endforeach
                             </select>
+                        </div> -->
+
+                        <div class="col-md-4 mb-2">
+                            <label>Party Name</label>
+                            <input type="text" name="parties_name" id="parties_name" class="form-control">
                         </div>
 
                         <div class="col-md-4 mb-2">
@@ -161,7 +166,7 @@ use App\Models\Issue;
                             <input type="number" step="0.01" name="final_amount" id="final_amount" class="form-control" style="background-color:#f8f8fb" required readonly>
                         </div>
 
-                        <div class="col-md-4 mb-2">
+                        <!-- <div class="col-md-4 mb-2">
                             <label>Broker Name</label>
                             <select name="broker_id" class="form-control">
                                 <option value="">Select Broker</option>
@@ -169,6 +174,11 @@ use App\Models\Issue;
                                 <option value="{{$broker->id}}">{{$broker->fname}} - {{$broker->lname}}</option>
                                 @endforeach
                             </select>
+                        </div> -->
+
+                        <div class="col-md-4 mb-2">
+                            <label>Broker Name</label>
+                            <input type="text" name="broker_name" id="broker_name" class="form-control">
                         </div>
 
                         <div class="col-md-4 mb-2">
@@ -265,13 +275,16 @@ use App\Models\Issue;
     });
     document.getElementById('sellForm').addEventListener('submit', function(e) {
 
-        let party = document.querySelector('[name="parties_id"]').value;
-        let broker = document.querySelector('[name="broker_id"]').value;
+        // let party = document.querySelector('[name="parties_id"]').value;
+        // let broker = document.querySelector('[name="broker_id"]').value;
+
+        let party = document.querySelector('[name="broker_name"]').value;
+        let broker = document.querySelector('[name="parties_name"]').value;
 
         if (!party && !broker) {
             e.preventDefault(); // form submit rok do
             // alert('Please select at least Party or Broker.');
-            showAlert('Please select at least Party or Broker.', 'danger');
+            showAlert('Please enter at least Party or Broker.', 'danger');
             return false;
         }
 

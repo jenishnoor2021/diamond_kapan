@@ -54,10 +54,10 @@
                                 <a href="{{ route('admin.khata.edit', $khata->id) }}"
                                     class="btn btn-outline-primary waves-effect waves-light"><i
                                         class="fa fa-edit"></i></a>
-                                <!-- <a href="{{ route('admin.khata.destroy', $khata->id) }}"
+                                <a href="{{ route('admin.khata.destroy', $khata->id) }}"
                                     onclick="return confirm('Sure ! You want to delete ?');"
                                     class="btn btn-outline-danger waves-effect waves-light"><i
-                                        class="fa fa-trash"></i></a> -->
+                                        class="fa fa-trash"></i></a>
                             </td>
                             <!-- <td>{{ $khata->id }}</td> -->
                             <td>{{ $khata->type }}</td>
