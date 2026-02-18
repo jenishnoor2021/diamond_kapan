@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Models\Issue;
 use App\Models\Kapan;
-use App\Models\Shape;
-use App\Models\Purchase;
 use App\Models\KapanPart;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Purchase;
+use App\Models\Sell;
+use App\Models\Shape;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Diamond extends Model
 {
@@ -39,5 +40,10 @@ class Diamond extends Model
     public function purchase()
     {
         return $this->hasOne(Purchase::class, 'diamonds_id');
+    }
+
+    public function sell()
+    {
+        return $this->hasOne(Sell::class, 'diamonds_id');
     }
 }

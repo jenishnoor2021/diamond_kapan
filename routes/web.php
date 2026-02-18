@@ -256,6 +256,10 @@ Route::group(['middleware' => ['auth', 'usersession']], function () {
     Route::get('admin/expnese/edit/{id}', [AdminExpenseController::class, 'editExpense'])->name('admin.expnese.edit.simple');
     // Route::patch('admin/expnese/update/{id}', [AdminExpenseController::class, 'update'])->name('admin.expnese.update');
     // Route::get('admin/expnese/destroy/{id}', [AdminExpenseController::class, 'destroy'])->name('admin.expnese.destroy');
+
+    Route::get("admin/update-diamond-status-to-sell", [AdminDiamondController::class, 'updateDiamondStatusToSell'])->name('admin.update.diamonds.status');
+    Route::get("admin/all-diamonds", [AdminDiamondController::class, 'allDiamonds'])->name('admin.all.diamonds');
+    Route::get('admin/diamond/detail/{id}', [AdminDiamondController::class, 'diamondDetail'])->name('admin.diamond.detail');
 });
 
 //Clear Cache facade value:

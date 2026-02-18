@@ -97,6 +97,13 @@
                 </a>
             </li>
 
+            <li>
+                <a href="/admin/all-diamonds" class="waves-effect">
+                    <i class="bx bx-diamond"></i>
+                    <span>All Diamonds</span>
+                </a>
+            </li>
+
             <li class="menu-title">Reports</li>
 
             <li>

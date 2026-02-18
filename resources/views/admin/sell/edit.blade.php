@@ -1,3 +1,8 @@
+<?php
+
+use App\Models\Issue;
+?>
+
 @extends('layouts.admin')
 @section('content')
 
@@ -17,6 +22,16 @@
          <div class="card-body">
             <h4 class="card-title mb-4">Edit</h4>
 
+            <?php
+            $cRWeight = 0;
+            $status = '';
+            $certiReturn = Issue::where('designation_id', 3)->where('diamonds_id', $sell->diamonds_id)->first();
+            if ($certiReturn) {
+               $cRWeight = $certiReturn->return_weight;
+               $status = $certiReturn->is_non_certi ? 'Non Certi' : 'Certi';
+            }
+            ?>
+
             @include('includes.flash_message')
 
             {!! Form::model($sell, ['method'=>'PATCH', 'action'=> ['AdminDiamondController@sellUpdate', $sell->id],'files'=>true,'class'=>'form-horizontal', 'name'=>'editsellform', 'id' => 'sellEditForm']) !!}
@@ -29,7 +44,7 @@
 
                <div class="col-md-4 mb-2">
                   <label>Diamond Weight</label>
-                  <input type="number" step="0.01" name="pWeight" id="pWeight" value="{{$diamond->prediction_weight}}" class="form-control" disabled>
+                  <input type="number" step="0.01" name="pWeight" id="pWeight" value="{{$cRWeight}}" class="form-control" disabled>
                </div>
 
                <!-- <div class="col-md-4 mb-2">

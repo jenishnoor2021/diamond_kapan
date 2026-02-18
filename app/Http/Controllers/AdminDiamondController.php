@@ -476,6 +476,9 @@ class AdminDiamondController extends Controller
 
         Purchase::where('id', $request->purchase_id)->update(['is_sell' => 1]);
 
+        $diamond = Diamond::where('id', $request->diamonds_id)->first();
+        $diamond->update(['status' => 'sell']);
+
         return redirect()->back()->with('success', 'Diamond sell entry saved successfully');
     }
 
@@ -531,6 +534,10 @@ class AdminDiamondController extends Controller
     {
         $sell = Sell::findOrFail($id);
         Purchase::where('id', $sell->purchase_id)->update(['is_sell' => 0]);
+
+        $diamond = Diamond::where('id', $sell->diamonds_id)->first();
+        $diamond->update(['status' => 'purchased']);
+
         $sell->delete();
         return Redirect::back()->with('success', "Delete Record Successfully");
     }
@@ -573,5 +580,53 @@ class AdminDiamondController extends Controller
         }
 
         return "Updated Successfully";
+    }
+
+    public function updateDiamondStatusToSell()
+    {
+        $diamondIds = Sell::pluck('diamonds_id');
+
+        Diamond::whereIn('id', $diamondIds)->update(['status' => 'sell']);
+
+        return Redirect::back()->with('success', "Status updated Successfully");
+    }
+
+    public function allDiamonds(Request $request)
+    {
+        $kapans = Kapan::where('is_active', 1)->orderBy('id', 'DESC')->get();
+
+        $diamonds = Diamond::with(['kapan', 'kapanPart'])
+            ->when($request->kapans_id, function ($q) use ($request) {
+                $q->where('kapans_id', $request->kapans_id);
+            })
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        return view('admin.diamond.all_diamonds', compact('kapans', 'diamonds'));
+    }
+
+    public function diamondDetail($id)
+    {
+        try {
+
+            $diamond = Diamond::with([
+                'kapan',
+                'kapanPart',
+                'issues',
+                'purchase',
+                'sell'
+            ])->findOrFail($id);
+
+            return response()->json([
+                'html' => view('admin.diamond.partials.diamond_detail_modal', compact('diamond'))->render()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'html' => '<div class="text-danger">' . $e->getMessage() . '</div>'
+            ]);
+        }
     }
 }
