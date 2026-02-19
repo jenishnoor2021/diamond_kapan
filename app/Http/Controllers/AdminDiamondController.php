@@ -629,4 +629,38 @@ class AdminDiamondController extends Controller
             ]);
         }
     }
+
+    public function updateName(Request $request)
+    {
+        $request->validate([
+            'diamond_id' => 'required|exists:diamonds,id',
+            'diamond_name' => 'required'
+        ]);
+
+        // Get current diamond
+        $diamond = Diamond::findOrFail($request->diamond_id);
+
+        // Check duplicate inside same kapan + part
+        $exists = Diamond::where('kapans_id', $diamond->kapans_id)
+            ->where('kapan_parts_id', $diamond->kapan_parts_id)
+            ->where('diamond_name', $request->diamond_name)
+            ->where('id', '!=', $diamond->id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Diamond name already exists!'
+            ]);
+        }
+
+        $diamond->update([
+            'diamond_name' => $request->diamond_name
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Updated Successfully'
+        ]);
+    }
 }

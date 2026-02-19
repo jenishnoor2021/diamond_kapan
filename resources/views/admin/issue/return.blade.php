@@ -114,6 +114,8 @@
           <thead>
             <tr>
               <th>Diamond Name</th>
+              <th>Shape</th>
+              <th>P Weight</th>
               @if(request('designation') != '3')
               <th>Return Weight</th>
               <th>Return Date</th>
@@ -132,7 +134,23 @@
 
                 <input type="hidden" name="issue_id" value="{{ $issue->id }}">
 
-                <td>{{ $issue->diamond->diamond_name }}</td>
+                <td class="d-flex justify-content-between align-items-center">
+
+                  <span class="diamond-name">
+                    {{ $issue->diamond->diamond_name }}
+                  </span>
+
+                  <button type="button"
+                    class="btn btn-sm btn-light editDiamondBtn ms-2"
+                    data-id="{{ $issue->diamond->id }}"
+                    data-name="{{ $issue->diamond->diamond_name }}" title="Update Name">
+                    <i class="fas fa-marker text-primary"></i>
+                  </button>
+
+                </td>
+
+                <td>{{ $issue->diamond->shapes->shape_type }}</td>
+                <td>{{ $issue->diamond->prediction_weight }}</td>
 
                 @if(request('designation') != '3')
                 <td>
@@ -199,6 +217,33 @@
 </div>
 
 
+<div class="modal fade" id="diamondNameModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Update Diamond Name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="diamond_id">
+
+        <label>Diamond Name</label>
+        <input type="text" id="diamond_name" class="form-control">
+
+        <div class="text-danger mt-2" id="nameError"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="updateDiamondName">
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal fade" id="certificateModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-lg">
     <form method="POST" action="{{ route('admin.return.store') }}">
@@ -238,7 +283,7 @@
 
             <div class="col-md-4 mb-2 certi-field">
               <label>Availability</label>
-              <input type="text" name="availability" id="availability" class="form-control" placeholder="Enter ailability" required>
+              <input type="text" name="availability" id="availability" class="form-control" placeholder="Enter ailability" value="GA" required>
             </div>
 
             <div class="col-md-4 mb-2 non-certi-field">
@@ -356,7 +401,7 @@
 
             <div class="col-md-4 mb-2 certi-field">
               <label>Lab</label>
-              <input type="text" name="lab" class="form-control" placeholder="Enter Lab">
+              <input type="text" name="lab" class="form-control" placeholder="Enter Lab" value="IGI">
             </div>
 
             <div class="col-md-4 mb-2 non-certi-field">
@@ -677,5 +722,40 @@
 
     document.getElementById('total_price').value = (weight * total.toFixed(2));
   }
+</script>
+
+<script>
+  // open modal
+  $(document).on('click', '.editDiamondBtn', function() {
+    $('#diamond_id').val($(this).data('id'));
+    $('#diamond_name').val($(this).data('name'));
+    $('#nameError').text('');
+    $('#diamondNameModal').modal('show');
+  });
+
+  // update
+  $('#updateDiamondName').click(function() {
+
+    $.ajax({
+      url: "{{ route('admin.diamond.update.name') }}",
+      type: "POST",
+      data: {
+        _token: "{{ csrf_token() }}",
+        diamond_id: $('#diamond_id').val(),
+        diamond_name: $('#diamond_name').val()
+      },
+      success: function(res) {
+
+        if (!res.status) {
+          $('#nameError').text(res.message);
+          return;
+        }
+
+        $('#diamondNameModal').modal('hide');
+        location.reload(); // or update row dynamically
+      }
+    });
+
+  });
 </script>
 @endsection
