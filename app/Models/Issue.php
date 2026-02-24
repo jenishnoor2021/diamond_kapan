@@ -17,7 +17,7 @@ class Issue extends Model
 
     public function kapans()
     {
-        return $this->belongsTo(Kapan::class);
+        return $this->belongsTo(Kapan::class, 'kapans_id');
     }
 
     public function kapanPart()
@@ -27,7 +27,7 @@ class Issue extends Model
 
     public function worker()
     {
-        return $this->belongsTo(Worker::class);
+        return $this->belongsTo(Worker::class, 'worker_id');
     }
 
     public function diamond()
@@ -38,5 +38,15 @@ class Issue extends Model
     public function designation()
     {
         return $this->belongsTo(Designation::class, 'designation_id');
+    }
+
+    // Status Accessor
+    public function getStatusAttribute()
+    {
+        if ($this->return_date && $this->return_weight > 0) {
+            return 'Returned';
+        }
+
+        return 'Pending';
     }
 }

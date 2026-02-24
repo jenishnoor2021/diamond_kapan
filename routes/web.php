@@ -25,6 +25,7 @@ use App\Http\Controllers\AdminKapanPartsController;
 use App\Http\Controllers\AdminDesignationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -263,6 +264,26 @@ Route::group(['middleware' => ['auth', 'usersession']], function () {
 
     Route::post('admin/diamond/update-name', [AdminDiamondController::class, 'updateName'])
         ->name('admin.diamond.update.name');
+
+    Route::get('admin/summary', [ReportController::class, 'summary'])
+        ->name('admin.summary');
+    Route::get('admin/ledger/{id}', [ReportController::class, 'ledger'])
+        ->name('admin.ledger');
+
+    Route::get('admin/worker-report', [ReportController::class, 'index'])
+        ->name('worker.report');
+
+    Route::get(
+        'get-workers-by-designation',
+        [ReportController::class, 'getWorkers']
+    );
+
+    Route::get('admin/kapan-report', [ReportController::class, 'kapanReport'])
+        ->name('kapan.report');
+    Route::get(
+        'admin/kapan-detail/{id}',
+        [ReportController::class, 'kapanDetail']
+    )->name('kapan.detail');
 });
 
 //Clear Cache facade value:

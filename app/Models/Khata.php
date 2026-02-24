@@ -26,4 +26,9 @@ class Khata extends Model
     {
         return $this->hasMany(Expense::class, 'khatas_id');
     }
+
+    public function getNameAttribute()
+    {
+        return $this->fname . ' ' . $this->lname;
+    }
 }

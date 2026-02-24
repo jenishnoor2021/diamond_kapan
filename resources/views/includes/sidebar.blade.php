@@ -113,12 +113,17 @@
                 </a>
                 <ul class="sub-menu">
                     <li>
-                        <a href="#">
+                        <a href="/admin/kapan-report">
+                            <i class="bx bx-user-check"></i> Kapan Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/summary">
                             <i class="bx bx-line-chart"></i> Expense Report
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="/admin/worker-report">
                             <i class="bx bx-user-check"></i> Worker Report
                         </a>
                     </li>

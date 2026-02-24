@@ -14,6 +14,6 @@ class Designation extends Model
 
     public function workers()
     {
-        return $this->hasMany(Worker::class);
+        return $this->hasMany(Worker::class, 'designation');
     }
 }
