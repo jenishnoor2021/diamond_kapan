@@ -118,13 +118,23 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/admin/summary">
+                        <a href="/admin/worker-report">
+                            <i class="bx bx-user-check"></i> Worker Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/sell-report">
+                            <i class="bx bx-user-check"></i> Sell Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/expense-summary">
                             <i class="bx bx-line-chart"></i> Expense Report
                         </a>
                     </li>
                     <li>
-                        <a href="/admin/worker-report">
-                            <i class="bx bx-user-check"></i> Worker Report
+                        <a href="/admin/income-summary">
+                            <i class="bx bx-line-chart"></i> Income Report
                         </a>
                     </li>
                 </ul>

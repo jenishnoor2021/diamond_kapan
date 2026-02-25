@@ -265,10 +265,13 @@ Route::group(['middleware' => ['auth', 'usersession']], function () {
     Route::post('admin/diamond/update-name', [AdminDiamondController::class, 'updateName'])
         ->name('admin.diamond.update.name');
 
-    Route::get('admin/summary', [ReportController::class, 'summary'])
-        ->name('admin.summary');
+    Route::get('admin/expense-summary', [ReportController::class, 'expenseSummary'])
+        ->name('admin.expense-summary');
     Route::get('admin/ledger/{id}', [ReportController::class, 'ledger'])
         ->name('admin.ledger');
+
+    Route::get('/admin/income-summary', [ReportController::class, 'incomeSummary'])
+        ->name('admin.income-summary');
 
     Route::get('admin/worker-report', [ReportController::class, 'index'])
         ->name('worker.report');
@@ -284,6 +287,10 @@ Route::group(['middleware' => ['auth', 'usersession']], function () {
         'admin/kapan-detail/{id}',
         [ReportController::class, 'kapanDetail']
     )->name('kapan.detail');
+    Route::get('admin/sell-report', [ReportController::class, 'sellReport'])
+        ->name('sell.report');
+    Route::get('admin/sell-report/{id}', [ReportController::class, 'sellDetail'])
+        ->name('sell.report.detail');
 });
 
 //Clear Cache facade value:
