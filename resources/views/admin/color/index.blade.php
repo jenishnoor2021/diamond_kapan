@@ -36,7 +36,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="c_name" class="form-label">Name</label>
-                                    <input type="text" name="c_name" class="form-control" id="c_name" placeholder="Enter Name" value="{{ old('c_name') }}" onkeypress='return (event.charCode != 32)' required>
+                                    <input type="text" name="c_name" class="form-control" id="c_name" placeholder="Enter Name" value="{{ old('c_name') }}" required>
                                     @if($errors->has('c_name'))
                                     <div class="error text-danger">{{ $errors->first('c_name') }}</div>
                                     @endif

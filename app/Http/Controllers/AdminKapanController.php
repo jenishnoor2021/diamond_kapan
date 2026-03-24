@@ -56,6 +56,12 @@ class AdminKapanController extends Controller
             'kapan_name'     => $input['kapan_name'],
             'kapan_weight'   => $input['kapan_weight'],
             'kapan_quantity' => $input['kapan_quantity'],
+            'per_carat_rate' => $input['per_carat_rate'],
+            'doller_rate'    => $input['doller_rate'],
+            'total_rate'     => $input['total_rate'],
+            'hpht_cost'      => $input['hpht_cost'],
+            'mfc_cost'       => $input['mfc_cost'],
+            'certificate_cost' => $input['certificate_cost'],
         ]);
 
         $kapans_id      = $kapan->id;
@@ -136,6 +142,12 @@ class AdminKapanController extends Controller
             'kapan_name'     => $request->kapan_name,
             'kapan_weight'   => $request->kapan_weight,
             'kapan_quantity' => $newQuantity,
+            'per_carat_rate' => $request->per_carat_rate,
+            'doller_rate'    => $request->doller_rate,
+            'total_rate'     => $request->total_rate,
+            'hpht_cost'      => $request->hpht_cost,
+            'mfc_cost'       => $request->mfc_cost,
+            'certificate_cost' => $request->certificate_cost,
         ]);
 
         // If quantity increased -> Add new parts

@@ -73,6 +73,74 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
     </div>
   </div>
 
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Kapan Cost</small>
+      <h5 class="mb-0">{{ number_format($kapan->total_rate,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">HPHT Cost</small>
+      <h5 class="mb-0">{{ number_format($kapan->hpht_cost,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">MFC Cost</small>
+      <h5 class="mb-0">{{ number_format($kapan->mfc_cost,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Certificate Cost</small>
+      <h5 class="mb-0">{{ number_format($kapan->certificate_cost,2) }}</h5>
+    </div>
+  </div>
+
+  @php
+  $totalCost = ($kapan->total_rate ?? 0) + ($kapan->hpht_cost ?? 0) + ($kapan->mfc_cost ?? 0) + ($kapan->certificate_cost ?? 0);
+  $diamondRate = $totalCost / ($kapan->prediction_weight ?? 1);
+  @endphp
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Total Cost</small>
+      <h5 class="mb-0">{{ number_format($totalCost,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Per Carate Cost</small>
+      <h5 class="mb-0">{{ number_format($diamondRate,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Total Sell Diamond</small>
+      <h5 class="mb-0">{{ number_format($totalSellDiamond,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Total Sell Amount</small>
+      <h5 class="mb-0">{{ number_format($totalSellAmount,2) }}</h5>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm border-0 text-center p-3">
+      <small class="text-muted">Pending Diamond</small>
+      <h5 class="mb-0">{{ number_format($pendingDiamond,2) }}</h5>
+    </div>
+  </div>
+
 </div>
 
 <div class="card mt-3 shadow-sm border-0">
@@ -101,6 +169,7 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
       <th>Prediction Weight</th>
       <th>Return Weight</th>
       <th>Status</th>
+      <th>Sell Amount</th>
       <th>Issue Process</th>
     </tr>
   </thead>
@@ -125,6 +194,7 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
         <span class="badge bg-warning text-dark">Purchased</span>
         @endif
       </td>
+      <td>{{$diamond->sell?->final_amount}}</td>
       <td>
 
         @foreach($diamond->issues as $issue)

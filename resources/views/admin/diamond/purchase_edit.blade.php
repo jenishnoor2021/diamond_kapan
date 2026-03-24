@@ -108,7 +108,8 @@
                <div class="col-md-4 non-certi-field">
                   <div class="mb-3">
                      <label>Color</label>
-                     <select name="r_color" id="r_color" class="form-select" required>
+                     <select name="r_color" id="r_color" class="form-select">
+                        <option value="">None</option>
                         @foreach($colors as $color)
                         <option value="{{$color->c_name}}" {{$color->c_name == $data->r_color ? 'selected' : '' }}>{{$color->c_name}}</option>
                         @endforeach

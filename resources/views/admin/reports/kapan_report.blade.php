@@ -51,9 +51,18 @@
             <th>Kapan Parts</th>
             <th>Total Diamonds</th>
             <th>Kapan Weight</th>
-            <th>Prediction Weight</th>
-            <th>Return Weight</th>
+            <!-- <th>Prediction Weight</th> -->
+            <!-- <th>Return Weight</th> -->
             <th>Total Pending Process Diamonds</th>
+            <th>Kapan Cost</th>
+            <th>HPHT Cost</th>
+            <th>MFC Cost</th>
+            <th>Certificate Cost</th>
+            <th>Total Cost</th>
+            <th>Per Carat Cost</th>
+            <th>Total Sell Diamond</th>
+            <th>Total Sell Amount</th>
+            <th>Pending Diamond</th>
           </tr>
         </thead>
         <tbody>
@@ -68,7 +77,7 @@
             <td>{{ $kapan->kapan_parts }}</td>
             <td>{{ $kapan->total_diamonds }}</td>
             <td><strong>{{ number_format($kapan->kapan_weight,2) }}</strong></td>
-            <td>
+            <!-- <td>
               <div>
                 <strong>
                   {{ number_format($kapan->prediction_weight ?? 0,2) }}
@@ -88,8 +97,28 @@
                   ({{ number_format($kapan->return_percent,2) }}%)
                 </small>
               </div>
-            </td>
+            </td> -->
             <td>{{ $kapan->total_pending_process_diamond ?? 0 }}</td>
+            <td>{{ number_format($kapan->total_rate,2) }}</td>
+            <td>{{ number_format($kapan->hpht_cost,2) }}</td>
+            <td>{{ number_format($kapan->mfc_cost,2) }}</td>
+            <td>{{ number_format($kapan->certificate_cost,2) }}</td>
+
+            <td><strong>{{ number_format($kapan->total_cost,2) }}</strong></td>
+
+            <td class="text-primary">
+              {{ number_format($kapan->per_carat_cost,2) }}
+            </td>
+
+            <td>{{ $kapan->total_sell_diamond }}</td>
+
+            <td class="text-success">
+              {{ number_format($kapan->total_sell_amount,2) }}
+            </td>
+
+            <td class="text-danger">
+              {{ $kapan->pending_diamond }}
+            </td>
           </tr>
           @endforeach
 

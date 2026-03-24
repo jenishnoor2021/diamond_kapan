@@ -288,7 +288,15 @@ class ReportController extends Controller
 
     public function kapanReport(Request $request)
     {
-        $query = Kapan::select('kapans.id', 'kapans.kapan_name', 'kapans.kapan_weight');
+        $query = Kapan::select(
+            'kapans.id',
+            'kapans.kapan_name',
+            'kapans.kapan_weight',
+            'kapans.total_rate',
+            'kapans.hpht_cost',
+            'kapans.mfc_cost',
+            'kapans.certificate_cost'
+        );
 
         // Kapan Name Filter
         if ($request->kapan_name) {
@@ -345,6 +353,38 @@ class ReportController extends Controller
                     ? ($returnWeight * 100) / $kapanWeight
                     : 0;
 
+                // Total Cost
+                $kapan->total_cost =
+                    ($kapan->total_rate ?? 0) +
+                    ($kapan->hpht_cost ?? 0) +
+                    ($kapan->mfc_cost ?? 0) +
+                    ($kapan->certificate_cost ?? 0);
+
+                // Per Carat Cost
+                $kapan->per_carat_cost = $predictionWeight > 0
+                    ? $kapan->total_cost / $predictionWeight
+                    : 0;
+
+                // Sell Data (IMPORTANT)
+                $sellData = DB::table('sells')
+                    ->join('diamonds', 'diamonds.id', '=', 'sells.diamonds_id')
+                    ->where('diamonds.kapans_id', $kapan->id)
+                    ->selectRaw('COUNT(*) as total_sell_diamond, SUM(final_amount) as total_sell_amount')
+                    ->first();
+
+                $kapan->total_sell_diamond = $sellData->total_sell_diamond ?? 0;
+                $kapan->total_sell_amount = $sellData->total_sell_amount ?? 0;
+
+                // Pending Diamond
+                $kapan->pending_diamond = DB::table('diamonds')
+                    ->where('kapans_id', $kapan->id)
+                    ->whereNotExists(function ($q) {
+                        $q->select(DB::raw(1))
+                            ->from('sells')
+                            ->whereColumn('sells.diamonds_id', 'diamonds.id');
+                    })
+                    ->count();
+
                 return $kapan;
             });
 
@@ -365,7 +405,7 @@ class ReportController extends Controller
             ->findOrFail($id);
 
         $diamonds = Diamond::where('kapans_id', $id)
-            ->with('issues')
+            ->with('issues', 'sell')
             ->orderByRaw("
             CASE
                 WHEN status = 'pending' THEN 1
@@ -377,9 +417,23 @@ class ReportController extends Controller
             ->orderBy('diamond_name') // optional secondary sorting
             ->get();
 
+        $totalSellAmount = DB::table('sells')
+            ->join('diamonds', 'diamonds.id', '=', 'sells.diamonds_id')
+            ->where('diamonds.kapans_id', $id)
+            ->sum('sells.final_amount');
+
+        $totalSellDiamond = DB::table('sells')
+            ->join('diamonds', 'diamonds.id', '=', 'sells.diamonds_id')
+            ->where('diamonds.kapans_id', $id)
+            ->count();
+
+        $pendingDiamond = Diamond::where('kapans_id', $id)
+            ->whereDoesntHave('sell')
+            ->count();
+
         return view(
             'admin.reports.kapan_detail',
-            compact('kapan', 'diamonds')
+            compact('kapan', 'diamonds', 'totalSellDiamond', 'totalSellAmount', 'pendingDiamond')
         );
     }
 

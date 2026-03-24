@@ -27,7 +27,7 @@
                <div class="col-md-4">
                   <div class="mb-3">
                      <label for="c_name" class="form-label">Name</label>
-                     <input type="text" name="c_name" class="form-control" id="c_name" placeholder="Enter name" onkeypress='return (event.charCode != 32)' value="{{$color->c_name}}" required>
+                     <input type="text" name="c_name" class="form-control" id="c_name" placeholder="Enter name" value="{{$color->c_name}}" required>
                      @if($errors->has('c_name'))
                      <div class="error text-danger">{{ $errors->first('c_name') }}</div>
                      @endif

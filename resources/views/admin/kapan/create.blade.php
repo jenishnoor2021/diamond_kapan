@@ -88,6 +88,111 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="per_carat_rate">Per Carat Rate</label>
+                            <input type="text"
+                                name="per_carat_rate"
+                                class="form-control"
+                                id="per_carat_rate"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="{{ old('per_carat_rate') }}"
+                                required>
+                            @if ($errors->has('per_carat_rate'))
+                            <div class="error text-danger">{{ $errors->first('per_carat_rate') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="doller_rate">Current $ Rate</label>
+                            <input type="text"
+                                name="doller_rate"
+                                class="form-control"
+                                id="doller_rate"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="{{ old('doller_rate') }}"
+                                required>
+                            @if ($errors->has('doller_rate'))
+                            <div class="error text-danger">{{ $errors->first('doller_rate') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="total_rate">Total Amount</label>
+                            <input type="text"
+                                name="total_rate"
+                                class="form-control"
+                                id="total_rate"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="{{ old('total_rate') }}"
+                                required>
+                            @if ($errors->has('total_rate'))
+                            <div class="error text-danger">{{ $errors->first('total_rate') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="hpht_cost">HPHT Cost</label>
+                            <input type="text"
+                                name="hpht_cost"
+                                class="form-control"
+                                id="hpht_cost"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="0">
+                            @if ($errors->has('hpht_cost'))
+                            <div class="error text-danger">{{ $errors->first('hpht_cost') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="mfc_cost">Manufacturing Cost</label>
+                            <input type="text"
+                                name="mfc_cost"
+                                class="form-control"
+                                id="mfc_cost"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="0">
+                            @if ($errors->has('mfc_cost'))
+                            <div class="error text-danger">{{ $errors->first('mfc_cost') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="certificate_cost">Certificate Cost</label>
+                            <input type="text"
+                                name="certificate_cost"
+                                class="form-control"
+                                id="certificate_cost"
+                                placeholder="00.00"
+                                inputmode="decimal"
+                                oninput="formatWeight(this)"
+                                value="0">
+                            @if ($errors->has('certificate_cost'))
+                            <div class="error text-danger">{{ $errors->first('certificate_cost') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex flex-wrap gap-2">
                     <button type="submit" class="btn btn-primary w-md">Save</button>
                     <a class="btn btn-light w-md" href="{{ URL::to('/admin/kapan') }}">Back</a>
@@ -148,5 +253,27 @@
 
         input.value = value;
     }
+</script>
+<script>
+    function calculateTotal() {
+
+        let kapan_weight = parseFloat($('#kapan_weight').val()) || 0;
+        let per_carat_rate = parseFloat($('#per_carat_rate').val()) || 0;
+        let doller_rate = parseFloat($('#doller_rate').val()) || 0;
+
+        let total = kapan_weight * per_carat_rate * doller_rate;
+
+        $('#total_rate').val(total.toFixed(2));
+    }
+
+    // trigger on input change
+    $('#kapan_weight, #per_carat_rate, #doller_rate').on('input', function() {
+        calculateTotal();
+    });
+
+    // run on page load (edit case)
+    $(document).ready(function() {
+        calculateTotal();
+    });
 </script>
 @endsection
