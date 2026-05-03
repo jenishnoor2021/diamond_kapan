@@ -103,7 +103,7 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
 
   @php
   $totalCost = ($kapan->total_rate ?? 0) + ($kapan->hpht_cost ?? 0) + ($kapan->mfc_cost ?? 0) + ($kapan->certificate_cost ?? 0);
-  $diamondRate = $totalCost / ($kapan->prediction_weight ?? 1);
+  $diamondRate = $totalCost / ($kapan->kapan_weight ?? 1);
   @endphp
 
   <div class="col-md-2">
@@ -170,7 +170,9 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
       <th>Return Weight</th>
       <th>Status</th>
       <th>Sell Amount</th>
-      <th>Issue Process</th>
+      <th>Profit/Loss Per carat</th>
+      <th>Total Profit/Loss</th>
+      <!-- <th>Issue Process</th> -->
     </tr>
   </thead>
   <tbody>
@@ -194,8 +196,42 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
         <span class="badge bg-warning text-dark">Purchased</span>
         @endif
       </td>
-      <td>{{$diamond->sell?->final_amount}}</td>
+      @php
+      $totalReturnWeight = $diamond->issues->sum('return_weight');
+      $sellAmount = $diamond->sell?->final_amount ?? 0;
+
+      // ✅ only calculate if SOLD
+      if($diamond->status == 'sell' && $totalReturnWeight > 0){
+      $profitPerCarat = ($sellAmount / $totalReturnWeight) - $diamondRate;
+      $totalProfit = $profitPerCarat * $totalReturnWeight;
+      } else {
+      $profitPerCarat = null;
+      $totalProfit = null;
+      }
+      @endphp
       <td>
+        {{ $diamond->status == 'sell' ? number_format($sellAmount,2) : '-' }}
+      </td>
+      <td>
+        @if(is_null($profitPerCarat))
+        -
+        @else
+        <span class="{{ $profitPerCarat > 0 ? 'text-success' : 'text-danger' }}">
+          {{ number_format($profitPerCarat, 2) }}
+        </span>
+        @endif
+      </td>
+
+      <td>
+        @if(is_null($totalProfit))
+        -
+        @else
+        <span class="{{ $totalProfit > 0 ? 'text-success' : 'text-danger' }}">
+          {{ number_format($totalProfit, 2) }}
+        </span>
+        @endif
+      </td>
+      <!-- <td>
 
         @foreach($diamond->issues as $issue)
         <div class="border p-1 mb-1">
@@ -207,7 +243,7 @@ $pendingWeight = ($kapan->prediction_weight ?? 0) - ($kapan->return_weight ?? 0)
         </div>
         @endforeach
 
-      </td>
+      </td> -->
     </tr>
     @endforeach
 

@@ -212,6 +212,8 @@ Route::group(['middleware' => ['auth', 'usersession']], function () {
     Route::get('admin/sell/destroy/{id}', [AdminDiamondController::class, 'sellDestroy'])->name('admin.sell.destroy');
     Route::get('admin/updatePartyBrokerFieldvalue', [AdminDiamondController::class, 'updatePartyBrokerFieldvalue'])->name('admin.updatePartyBrokerFieldvalue');
 
+    Route::post('/sell/update-status', [AdminDiamondController::class, 'updateStatus'])->name('admin.sell.updateStatus');
+
 
     Route::get("admin/party", [AdminPartyController::class, 'index'])->name('admin.party.index');
     Route::get('admin/party/create', [AdminPartyController::class, 'create'])->name('admin.party.create');

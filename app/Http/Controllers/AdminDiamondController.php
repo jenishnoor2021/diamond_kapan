@@ -488,6 +488,26 @@ class AdminDiamondController extends Controller
         return view('admin.sell.index', compact('sells'));
     }
 
+    public function updateStatus(Request $request)
+    {
+        $sell = Sell::find($request->id);
+
+        if (!$sell) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found'
+            ]);
+        }
+
+        $sell->payment_status = $request->status;
+        $sell->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully'
+        ]);
+    }
+
     public function sellEdit($id)
     {
         $sell = Sell::findOrFail($id);
