@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PurchaseDiamondsExport;
 use Illuminate\Support\Facades\Redirect;
+use App\Imports\UpdateIssuePriceImport;
 
 class AdminDiamondController extends Controller
 {
@@ -682,5 +683,17 @@ class AdminDiamondController extends Controller
             'status' => true,
             'message' => 'Updated Successfully'
         ]);
+    }
+
+    public function import(Request $request)
+    {
+        return view('admin.diamond.import');
+    }
+
+    public function importPriceUpdate(Request $request)
+    {
+        Excel::import(new UpdateIssuePriceImport, $request->file('import_file'));
+
+        return back()->with('success', 'Data Updated Successfully');
     }
 }
