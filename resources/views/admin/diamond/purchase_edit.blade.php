@@ -331,23 +331,35 @@
    document.addEventListener("DOMContentLoaded", function() {
 
       const checkbox = document.getElementById('is_certified');
+      const certiFields = document.querySelectorAll('.certi-field');
 
-      // Toggle certified fields
-      function toggleFields() {
-         const certiFields = document.querySelectorAll('.certi-field');
-
-         certiFields.forEach(field => {
-            field.style.display = checkbox.checked ? '' : 'none';
+      function setFieldState(field, enabled) {
+         field.style.display = enabled ? '' : 'none';
+         field.querySelectorAll('input, select, textarea').forEach(el => {
+            el.disabled = !enabled;
+            if (el.hasAttribute('required')) {
+               el.required = enabled;
+            }
          });
+      }
+
+      function toggleFields() {
+         certiFields.forEach(field => setFieldState(field, checkbox.checked));
       }
 
       checkbox.addEventListener('change', toggleFields);
       toggleFields();
 
+      document.getElementById('certi_no').addEventListener('input', function() {
+         let certiNo = this.value.trim();
+         let baseUrl = "https://api.igi.org/viewpdf.php?r=";
 
-      // Discount Calculation
+         document.querySelector('[name="Certificate_url"]').value = certiNo ?
+            baseUrl + certiNo :
+            '';
+      });
+
       function calculateTotal() {
-
          let weight = parseFloat(document.getElementById('return_weight').value) || 0;
          let price = parseFloat(document.getElementById('price').value) || 0;
          let discount = parseFloat(document.getElementById('discount')?.value) || 0;
@@ -362,47 +374,31 @@
       document.getElementById('price').addEventListener('input', calculateTotal);
       document.getElementById('discount')?.addEventListener('input', calculateTotal);
 
-   });
-</script>
-<script>
-   document.getElementById('certi_no').addEventListener('input', function() {
-      let certiNo = this.value.trim();
+      document.getElementById('return_weight').addEventListener('input', function() {
+         let prediction = parseFloat(this.dataset.prediction);
+         let returnWeight = parseFloat(this.value);
 
-      let baseUrl = "https://api.igi.org/viewpdf.php?r=";
+         if (isNaN(returnWeight)) {
+            document.getElementById('weightMessage').innerHTML = '';
+            return;
+         }
 
-      document.querySelector('[name="Certificate_url"]').value = certiNo ?
-         baseUrl + certiNo :
-         '';
-   });
+         let difference = (prediction - returnWeight).toFixed(2);
 
-   document.getElementById('return_weight').addEventListener('input', function() {
+         if (difference > 0) {
+            document.getElementById('weightMessage').innerHTML =
+               "<span class='text-warning'>Diffrence is : " + difference + "</span>";
+         } else if (difference < 0) {
+            document.getElementById('weightMessage').innerHTML =
+               "<span class='text-danger'>Diffrence is : " + Math.abs(difference) + "</span>";
+         } else {
+            document.getElementById('weightMessage').innerHTML =
+               "<span class='text-success'>Exact Match</span>";
+         }
+      });
 
-      let prediction = parseFloat(this.dataset.prediction);
-      let returnWeight = parseFloat(this.value);
-
-      if (isNaN(returnWeight)) {
-         document.getElementById('weightMessage').innerHTML = '';
-         return;
-      }
-
-      let difference = (prediction - returnWeight).toFixed(2);
-
-      if (difference > 0) {
-         document.getElementById('weightMessage').innerHTML =
-            "<span class='text-warning'>Diffrence is : " + difference + "</span>";
-      } else if (difference < 0) {
-         document.getElementById('weightMessage').innerHTML =
-            "<span class='text-danger'>Diffrence is : " + Math.abs(difference) + "</span>";
-      } else {
-         document.getElementById('weightMessage').innerHTML =
-            "<span class='text-success'>Exact Match</span>";
-      }
-   });
-
-   window.addEventListener('DOMContentLoaded', function() {
-      let input = document.getElementById('return_weight');
-      if (input.value) {
-         input.dispatchEvent(new Event('input'));
+      if (document.getElementById('return_weight').value) {
+         document.getElementById('return_weight').dispatchEvent(new Event('input'));
       }
    });
 </script>

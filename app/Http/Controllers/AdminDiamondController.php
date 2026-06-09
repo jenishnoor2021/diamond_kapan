@@ -413,10 +413,17 @@ class AdminDiamondController extends Controller
         $issue = Issue::findOrFail($id);
         $diamond = Diamond::where('id', $issue->diamonds_id)->first();
 
-        $data = $request->except(['_token', '_method']);
+        $data = $request->except(['_token', '_method', 'issue_id']);
 
-        // ✅ Reverse checkbox logic
-        $data['is_non_certi'] = $request->has('is_non_certi') ? 0 : 1;
+        $isNonCertiInput = $request->input('is_non_certi');
+        if (is_array($isNonCertiInput)) {
+            $isNonCertiInput = end($isNonCertiInput);
+        }
+        if ($isNonCertiInput !== null) {
+            $data['is_non_certi'] = $isNonCertiInput;
+        } else {
+            $data['is_non_certi'] = $issue->is_non_certi;
+        }
 
         // ✅ Discount Calculation
         $weight   = $request->return_weight ?? 0;

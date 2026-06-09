@@ -57,6 +57,14 @@ use App\Models\Issue;
                         <tr>
                             <th>Action</th>
                             <th>Diamond Name</th>
+                            <th>Return Weight</th>
+                            <th>Shape</th>
+                            <th>Color</th>
+                            <th>Clarity</th>
+                            <th>Polish</th>
+                            <th>Symmetry</th>
+                            <th>Price</th>
+                            <th>Total Price</th>
                             <th>Diamond Status</th>
                         </tr>
                     </thead>
@@ -76,6 +84,21 @@ use App\Models\Issue;
                         <tr>
                             <td>
                                 <a href="{{ route('admin.purchase.edit', $purchase->id) }}" target="_blank" class="btn btn-outline-primary waves-effect waves-light"><i class="fa fa-edit"></i></a>
+                                @if($certiReturn)
+                                <button
+                                    class="btn btn-outline-info waves-effect waves-light priceBtn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#priceUpdateModal"
+                                    data-issue-id="{{ $certiReturn->id }}"
+                                    data-return-weight="{{ $certiReturn->return_weight }}"
+                                    data-price="{{ $certiReturn->price }}"
+                                    data-discount="{{ $certiReturn->discount }}"
+                                    data-total-price="{{ $certiReturn->total_price }}"
+                                    data-return-date="{{ $certiReturn->return_date }}"
+                                    data-is-non-certi="{{ $certiReturn->is_non_certi }}">
+                                    Price
+                                </button>
+                                @endif
                                 <button
                                     class="btn btn-outline-success waves-effect waves-light sellBtn"
                                     data-bs-toggle="modal"
@@ -87,7 +110,15 @@ use App\Models\Issue;
                                     Sell
                                 </button>
                             </td>
-                            <td>{{ $purchase->diamond->diamond_name }}</td>
+                            <td>{{ optional($purchase->diamond)->diamond_name }}</td>
+                            <td>{{ $certiReturn->return_weight ?? '' }}</td>
+                            <td>{{ $certiReturn->r_shape ?? '' }}</td>
+                            <td>{{ $certiReturn->r_color ?? '' }}</td>
+                            <td>{{ $certiReturn->r_clarity ?? '' }}</td>
+                            <td>{{ $certiReturn->r_polish ?? '' }}</td>
+                            <td>{{ $certiReturn->r_symmetry ?? '' }}</td>
+                            <td>{{ $certiReturn->price ?? '' }}</td>
+                            <td>{{ $certiReturn->total_price ?? '' }}</td>
                             <td>
                                 @if($status)
                                 <span class="badge {{ $status === 'Non Certi' ? 'bg-danger' : 'bg-success' }}">
@@ -105,6 +136,51 @@ use App\Models\Issue;
     </div> <!-- end col -->
 </div> <!-- end row -->
 
+
+<div class="modal fade" id="priceUpdateModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <form method="POST" id="priceUpdateForm">
+            @csrf
+            @method('PATCH')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Purchase Price</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="price_issue_id">
+                    <input type="hidden" name="is_non_certi" id="price_is_non_certi" value="1">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label>Return Weight</label>
+                            <input type="number" step="0.01" name="return_weight" id="price_return_weight" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Return Date</label>
+                            <input type="date" name="return_date" id="price_return_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Price</label>
+                            <input type="number" step="0.01" name="price" id="price_value" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Discount (%)</label>
+                            <input type="number" step="0.01" name="discount" id="price_discount" class="form-control" value="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Total Price</label>
+                            <input type="number" step="0.01" name="total_price" id="price_total_price" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="modal fade" id="sellModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -277,7 +353,43 @@ use App\Models\Issue;
             // calculation trigger kar do
             calculateAmounts();
         }
+
+        if (e.target.closest('.priceBtn')) {
+            let button = e.target.closest('.priceBtn');
+            let issueId = button.dataset.issueId;
+            let weight = button.dataset.returnWeight || 0;
+            let price = button.dataset.price || 0;
+            let discount = button.dataset.discount || 0;
+            let totalPrice = button.dataset.totalPrice || 0;
+            let returnDate = button.dataset.returnDate || new Date().toISOString().slice(0, 10);
+            let isNonCerti = button.dataset.isNonCerti || 1;
+
+            document.getElementById('price_issue_id').value = issueId;
+            document.getElementById('price_return_weight').value = weight;
+            document.getElementById('price_value').value = price;
+            document.getElementById('price_discount').value = discount;
+            document.getElementById('price_total_price').value = totalPrice;
+            document.getElementById('price_return_date').value = returnDate;
+            document.getElementById('price_is_non_certi').value = isNonCerti;
+
+            document.getElementById('priceUpdateForm').action = '/admin/purchase/update/' + issueId;
+        }
     });
+
+    function calculatePriceTotal() {
+        let weight = parseFloat(document.getElementById('price_return_weight').value) || 0;
+        let price = parseFloat(document.getElementById('price_value').value) || 0;
+        let discount = parseFloat(document.getElementById('price_discount').value) || 0;
+
+        let base = weight * price;
+        let total = discount > 0 ? base - (base * discount / 100) : base;
+        document.getElementById('price_total_price').value = total.toFixed(2);
+    }
+
+    ['price_return_weight', 'price_value', 'price_discount'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculatePriceTotal);
+    });
+
     document.getElementById('sellForm').addEventListener('submit', function(e) {
 
         // let party = document.querySelector('[name="parties_id"]').value;
@@ -332,6 +444,43 @@ use App\Models\Issue;
         '#pWeight, #rate_per_ct, #dollar_rate, #less_brokerage'
     ).forEach(el => {
         el.addEventListener('input', calculateAmounts);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var priceUpdateModal = document.getElementById('priceUpdateModal');
+        if (!priceUpdateModal) return;
+
+        priceUpdateModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            if (!button) return;
+
+            var issueId = button.getAttribute('data-issue-id');
+            var weight = button.getAttribute('data-return-weight') || 0;
+            var price = button.getAttribute('data-price') || 0;
+            var discount = button.getAttribute('data-discount') || 0;
+            var totalPrice = button.getAttribute('data-total-price') || 0;
+            var returnDate = button.getAttribute('data-return-date') || new Date().toISOString().slice(0, 10);
+            var isNonCerti = button.getAttribute('data-is-non-certi') || 1;
+
+            document.getElementById('price_issue_id').value = issueId;
+            document.getElementById('price_return_weight').value = weight;
+            document.getElementById('price_value').value = price;
+            document.getElementById('price_discount').value = discount;
+            document.getElementById('price_total_price').value = totalPrice;
+            document.getElementById('price_return_date').value = returnDate;
+            document.getElementById('price_is_non_certi').value = isNonCerti;
+
+            var form = document.getElementById('priceUpdateForm');
+            if (form) {
+                form.action = '/admin/purchase/update/' + issueId;
+            }
+
+            // ensure total is calculated when modal opens
+            var ev = new Event('input');
+            document.getElementById('price_return_weight').dispatchEvent(ev);
+        });
     });
 </script>
 @endsection
