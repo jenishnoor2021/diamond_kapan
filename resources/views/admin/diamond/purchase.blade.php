@@ -117,8 +117,25 @@ use App\Models\Issue;
                             <td>{{ $certiReturn->r_clarity ?? '' }}</td>
                             <td>{{ $certiReturn->r_polish ?? '' }}</td>
                             <td>{{ $certiReturn->r_symmetry ?? '' }}</td>
-                            <td>{{ $certiReturn->price ?? '' }}</td>
-                            <td>{{ $certiReturn->total_price ?? '' }}</td>
+                            <td>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control form-control-sm inline-price-input"
+                                    data-issue-id="{{ $certiReturn->id }}"
+                                    data-return-weight="{{ $certiReturn->return_weight }}"
+                                    data-return-date="{{ $certiReturn->return_date }}"
+                                    data-discount="{{ $certiReturn->discount ?? 0 }}"
+                                    data-is-non-certi="{{ $certiReturn->is_non_certi }}"
+                                    value="{{ $certiReturn->price ?? 0 }}">
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    class="form-control form-control-sm total-price-display"
+                                    readonly
+                                    value="{{ number_format($certiReturn->total_price ?? 0, 2, '.', '') }}">
+                            </td>
                             <td>
                                 @if($status)
                                 <span class="badge {{ $status === 'Non Certi' ? 'bg-danger' : 'bg-success' }}">
@@ -354,26 +371,6 @@ use App\Models\Issue;
             calculateAmounts();
         }
 
-        if (e.target.closest('.priceBtn')) {
-            let button = e.target.closest('.priceBtn');
-            let issueId = button.dataset.issueId;
-            let weight = button.dataset.returnWeight || 0;
-            let price = button.dataset.price || 0;
-            let discount = button.dataset.discount || 0;
-            let totalPrice = button.dataset.totalPrice || 0;
-            let returnDate = button.dataset.returnDate || new Date().toISOString().slice(0, 10);
-            let isNonCerti = button.dataset.isNonCerti || 1;
-
-            document.getElementById('price_issue_id').value = issueId;
-            document.getElementById('price_return_weight').value = weight;
-            document.getElementById('price_value').value = price;
-            document.getElementById('price_discount').value = discount;
-            document.getElementById('price_total_price').value = totalPrice;
-            document.getElementById('price_return_date').value = returnDate;
-            document.getElementById('price_is_non_certi').value = isNonCerti;
-
-            document.getElementById('priceUpdateForm').action = '/admin/purchase/update/' + issueId;
-        }
     });
 
     function calculatePriceTotal() {
@@ -445,6 +442,184 @@ use App\Models\Issue;
     ).forEach(el => {
         el.addEventListener('input', calculateAmounts);
     });
+
+    function saveInlinePrice(input) {
+        const issueId = input.dataset.issueId;
+        const price = parseFloat(input.value) || 0;
+        const returnWeight = parseFloat(input.dataset.returnWeight) || 0;
+        const discount = parseFloat(input.dataset.discount) || 0;
+        const returnDate = input.dataset.returnDate || new Date().toISOString().slice(0, 10);
+        const isNonCerti = input.dataset.isNonCerti || 1;
+
+        const total = discount > 0 ?
+            returnWeight * price - (returnWeight * price * discount / 100) :
+            returnWeight * price;
+
+        const totalPriceInput = input.closest('tr').querySelector('.total-price-display');
+        if (totalPriceInput) {
+            totalPriceInput.value = total.toFixed(2);
+        }
+
+        const priceBtn = input.closest('tr').querySelector('.priceBtn');
+        if (priceBtn) {
+            priceBtn.dataset.price = price;
+            priceBtn.dataset.discount = discount;
+            priceBtn.dataset.returnDate = returnDate;
+            priceBtn.dataset.totalPrice = total.toFixed(2);
+        }
+
+        const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = tokenMeta ? tokenMeta.getAttribute('content') : '';
+
+        fetch('/admin/purchase/update/' + issueId, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-HTTP-Method-Override': 'PATCH'
+                },
+                body: JSON.stringify({
+                    return_weight: returnWeight,
+                    return_date: returnDate,
+                    price: price,
+                    discount: discount,
+                    is_non_certi: isNonCerti
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        const message = `HTTP ${response.status} ${response.statusText}: ${text}`;
+                        throw new Error(message);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    if (typeof showAlert === 'function') {
+                        showAlert(data.message || 'Price updated successfully', 'success');
+                    }
+                } else {
+                    if (typeof showAlert === 'function') {
+                        showAlert(data.message || 'Could not update price', 'danger');
+                    } else {
+                        console.error(data.message || 'Could not update price');
+                    }
+                }
+            })
+            .catch(error => {
+                const message = error.message || 'Inline price update failed';
+                if (typeof showAlert === 'function') {
+                    showAlert(message, 'danger');
+                } else {
+                    console.error(message);
+                }
+            });
+    }
+
+    document.addEventListener('blur', function(e) {
+        if (e.target.matches('.inline-price-input')) {
+            saveInlinePrice(e.target);
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.target.matches('.inline-price-input') && e.key === 'Enter') {
+            e.preventDefault();
+            saveInlinePrice(e.target);
+            e.target.blur();
+        }
+    }, true);
+
+    document.getElementById('priceUpdateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const issueId = document.getElementById('price_issue_id').value;
+        const price = parseFloat(document.getElementById('price_value').value) || 0;
+        const returnWeight = parseFloat(document.getElementById('price_return_weight').value) || 0;
+        const discount = parseFloat(document.getElementById('price_discount').value) || 0;
+        const returnDate = document.getElementById('price_return_date').value;
+        const isNonCerti = document.getElementById('price_is_non_certi').value || 1;
+
+        const total = discount > 0 ?
+            returnWeight * price - (returnWeight * price * discount / 100) :
+            returnWeight * price;
+
+        const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = tokenMeta ? tokenMeta.getAttribute('content') : '';
+
+        fetch('/admin/purchase/update/' + issueId, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-HTTP-Method-Override': 'PATCH'
+                },
+                body: JSON.stringify({
+                    return_weight: returnWeight,
+                    return_date: returnDate,
+                    price: price,
+                    discount: discount,
+                    is_non_certi: isNonCerti
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status} ${response.statusText}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.message || 'Could not update price');
+                }
+
+                const row = document.querySelector(`.inline-price-input[data-issue-id="${issueId}"]`);
+                if (row) {
+                    row.value = price.toFixed(2);
+                    row.dataset.discount = discount;
+                    row.dataset.returnDate = returnDate;
+                    const totalPriceInput = row.closest('tr').querySelector('.total-price-display');
+                    if (totalPriceInput) {
+                        totalPriceInput.value = total.toFixed(2);
+                    }
+                    const priceBtn = row.closest('tr').querySelector('.priceBtn');
+                    if (priceBtn) {
+                        priceBtn.dataset.price = price;
+                        priceBtn.dataset.discount = discount;
+                        priceBtn.dataset.returnDate = returnDate;
+                        priceBtn.dataset.totalPrice = total.toFixed(2);
+                    }
+                }
+
+                if (typeof showAlert === 'function') {
+                    showAlert(data.message || 'Price updated successfully', 'success');
+                }
+
+                const modalEl = document.getElementById('priceUpdateModal');
+                const bsModal = modalEl && window.bootstrap ? window.bootstrap.Modal.getInstance(modalEl) : null;
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            })
+            .catch(error => {
+                const message = error.message || 'Modal price save failed';
+                if (typeof showAlert === 'function') {
+                    showAlert(message, 'danger');
+                } else {
+                    console.error(message);
+                }
+            });
+    });
 </script>
 
 <script>
@@ -457,18 +632,23 @@ use App\Models\Issue;
             if (!button) return;
 
             var issueId = button.getAttribute('data-issue-id');
-            var weight = button.getAttribute('data-return-weight') || 0;
-            var price = button.getAttribute('data-price') || 0;
-            var discount = button.getAttribute('data-discount') || 0;
-            var totalPrice = button.getAttribute('data-total-price') || 0;
-            var returnDate = button.getAttribute('data-return-date') || new Date().toISOString().slice(0, 10);
+            var row = button.closest('tr');
+            var priceInput = row ? row.querySelector('.inline-price-input') : null;
+            var weight = priceInput ? parseFloat(priceInput.dataset.returnWeight) || 0 : parseFloat(button.getAttribute('data-return-weight')) || 0;
+            var discount = priceInput ? parseFloat(priceInput.dataset.discount) || 0 : parseFloat(button.getAttribute('data-discount')) || 0;
+            var returnDate = priceInput ? priceInput.dataset.returnDate || new Date().toISOString().slice(0, 10) : button.getAttribute('data-return-date') || new Date().toISOString().slice(0, 10);
             var isNonCerti = button.getAttribute('data-is-non-certi') || 1;
+            var price = priceInput ? parseFloat(priceInput.value) || 0 : parseFloat(button.getAttribute('data-price')) || 0;
+            var totalPrice = price * weight;
+            if (discount > 0) {
+                totalPrice = totalPrice - (totalPrice * discount / 100);
+            }
 
             document.getElementById('price_issue_id').value = issueId;
             document.getElementById('price_return_weight').value = weight;
             document.getElementById('price_value').value = price;
             document.getElementById('price_discount').value = discount;
-            document.getElementById('price_total_price').value = totalPrice;
+            document.getElementById('price_total_price').value = totalPrice.toFixed(2);
             document.getElementById('price_return_date').value = returnDate;
             document.getElementById('price_is_non_certi').value = isNonCerti;
 

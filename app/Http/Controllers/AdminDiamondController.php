@@ -445,6 +445,14 @@ class AdminDiamondController extends Controller
             $diamond->update(['status' => 'purchased']);
         }
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Price updated successfully',
+                'total_price' => $totalPrice
+            ]);
+        }
+
         return redirect('admin/purchase')->with('success', 'updated successfully');
     }
 
