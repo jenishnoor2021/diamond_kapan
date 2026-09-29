@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use App\Models\Issue;
 use App\Models\Kapan;
+use App\Models\Diamond;
 use App\Models\KapanPart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -196,6 +198,8 @@ class AdminKapanController extends Controller
         $kapan = Kapan::findOrFail($id);
 
         KapanPart::where('kapans_id', $id)->delete();
+        Issue::where('kapans_id', $id)->delete();
+        Diamond::where('kapans_id', $id)->delete();
 
         $kapan->delete();
 

@@ -145,6 +145,51 @@ class AdminIssueController extends Controller
 
     public function return(Request $request)
     {
+        // 1. Validate designation if provided
+        if ($request->filled('designation')) {
+            $designationExists = Designation::where('id', $request->designation)->exists();
+            if (!$designationExists) {
+                return redirect()->route('admin.return.index')
+                    ->with('error', 'Selected Designation not found or may have been deleted.');
+            }
+        }
+
+        // 2. Validate worker_id if provided
+        if ($request->filled('worker_id')) {
+            $workerExists = Worker::where('id', $request->worker_id)->exists();
+            if (!$workerExists) {
+                return redirect()->route('admin.return.index', [
+                    'designation' => $request->designation,
+                ])->with('error', 'Selected Worker not found or may have been deleted.');
+            }
+        }
+
+        // 3. Validate kapans_id if provided
+        if ($request->filled('kapans_id')) {
+            $kapan = Kapan::find($request->kapans_id);
+            if (!$kapan) {
+                return redirect()->route('admin.return.index', [
+                    'designation' => $request->designation,
+                    'worker_id'   => $request->worker_id,
+                ])->with('error', 'Selected Kapan not found or may have been deleted.');
+            }
+        }
+
+        // 4. Validate kapan_parts_id if provided
+        if ($request->filled('kapan_parts_id')) {
+            $partExists = KapanPart::where('id', $request->kapan_parts_id)
+                ->when($request->filled('kapans_id'), function ($q) use ($request) {
+                    $q->where('kapans_id', $request->kapans_id);
+                })->exists();
+            if (!$partExists) {
+                return redirect()->route('admin.return.index', [
+                    'designation' => $request->designation,
+                    'worker_id'   => $request->worker_id,
+                    'kapans_id'   => $request->kapans_id,
+                ])->with('error', 'Selected Kapan Part not found or may have been deleted.');
+            }
+        }
+
         $designations = Designation::get();
         $shapes = Shape::get();
         $colors = Color::get();
@@ -153,14 +198,14 @@ class AdminIssueController extends Controller
         $symmetry = Symmetry::get();
         $kapans = Kapan::where('is_active', 1)->orderBy('id', 'DESC')->get();
 
+        // If the selected kapan exists but is inactive, include it in the dropdown
+        if ($request->filled('kapans_id') && isset($kapan) && !$kapans->contains('id', $kapan->id)) {
+            $kapans->push($kapan);
+        }
+
         $workers = [];
         $kapan_parts = [];
-        // $issues = Issue::with('diamond')
-        //     ->where('is_return', 0)
-        //     ->orderBy('id', 'ASC')
-        //     ->get();
-
-        $issues = [];
+        $issues = collect();
 
         if ($request->filled('designation')) {
             $workers = Worker::where('designation', $request->designation)
@@ -168,21 +213,20 @@ class AdminIssueController extends Controller
                 ->get();
         }
 
-        // if ($request->filled('kapans_id') && $request->filled('worker_id')) {
         if ($request->filled('worker_id')) {
-
-            $issues = Issue::with('diamond')
+            $issues = Issue::whereHas('diamond')
+                ->with(['diamond.shapes'])
                 ->where('worker_id', $request->worker_id)
                 ->where('is_return', 0)
-
+                ->when($request->filled('designation'), function ($q) use ($request) {
+                    $q->where('designation_id', $request->designation);
+                })
                 ->when($request->filled('kapans_id'), function ($q) use ($request) {
                     $q->where('kapans_id', $request->kapans_id);
                 })
-
                 ->when($request->filled('kapan_parts_id'), function ($q) use ($request) {
                     $q->where('kapan_parts_id', $request->kapan_parts_id);
                 })
-
                 ->orderBy('id', 'ASC')
                 ->get();
 
@@ -242,18 +286,7 @@ class AdminIssueController extends Controller
 
         $issue->update($data);
 
-        // $issue->update([
-        //     'return_weight' => $request->return_weight,
-        //     'return_date'   => $request->return_date,
-        //     'is_return'     => 1,
-        //     'r_color'       => $request->r_color ?? NULL,
-        //     'r_shape'       => $request->r_shape ?? NULL,
-        //     'r_clarity'     => $request->r_clarity ?? NULL,
-        //     'certi_no'     => $request->certi_no ?? NULL,
-        // ]);
-
-        // if ($issue->designation_id == 3 && !empty($request->certi_no)) {
-        if ($issue->designation_id == 3) {
+        if ($issue->designation_id == 3 && $diamond) {
             $diamond->update(['status' => 'purchased']);
 
             Purchase::firstOrCreate([

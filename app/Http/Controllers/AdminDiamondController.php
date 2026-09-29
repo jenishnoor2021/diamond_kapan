@@ -343,6 +343,7 @@ class AdminDiamondController extends Controller
     public function destroy($id)
     {
         $diamond = Diamond::findOrFail($id);
+        Issue::where('diamonds_id', $id)->delete();
         $diamond->delete();
         return Redirect::back()->with('success', "Delete Record Successfully");
     }

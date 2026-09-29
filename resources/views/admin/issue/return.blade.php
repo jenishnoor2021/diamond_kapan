@@ -128,6 +128,7 @@
 
           <tbody>
             @foreach($issues as $issue)
+            @if($issue->diamond)
             <tr>
               <form method="POST" action="{{ route('admin.return.store') }}">
                 @csrf
@@ -137,20 +138,20 @@
                 <td class="d-flex justify-content-between align-items-center">
 
                   <span class="diamond-name">
-                    {{ $issue->diamond->diamond_name }}
+                    {{ $issue->diamond->diamond_name ?? '-' }}
                   </span>
 
                   <button type="button"
                     class="btn btn-sm btn-light editDiamondBtn ms-2"
-                    data-id="{{ $issue->diamond->id }}"
-                    data-name="{{ $issue->diamond->diamond_name }}" title="Update Name">
+                    data-id="{{ $issue->diamond->id ?? $issue->diamonds_id }}"
+                    data-name="{{ $issue->diamond->diamond_name ?? '' }}" title="Update Name">
                     <i class="fas fa-marker text-primary"></i>
                   </button>
 
                 </td>
 
-                <td>{{ $issue->diamond->shapes->shape_type }}</td>
-                <td>{{ $issue->diamond->prediction_weight }}</td>
+                <td>{{ optional($issue->diamond->shapes)->shape_type ?? '-' }}</td>
+                <td>{{ $issue->diamond->prediction_weight ?? 0 }}</td>
 
                 @if(request('designation') != '3')
                 <td>
@@ -159,8 +160,8 @@
                     name="return_weight"
                     class="form-control return-weight"
                     value=""
-                    max="{{ $issue->diamond->prediction_weight }}"
-                    data-issue-weight="{{ $issue->diamond->prediction_weight }}"
+                    max="{{ $issue->diamond->prediction_weight ?? 0 }}"
+                    data-issue-weight="{{ $issue->diamond->prediction_weight ?? 0 }}"
                     placeholder="returm weight"
                     required>
                 </td>
@@ -170,8 +171,8 @@
                     name="return_date"
                     class="form-control return-date"
                     value="{{ now()->toDateString() }}"
-                    min="{{ \Carbon\Carbon::parse($issue->issue_date)->toDateString() }}"
-                    data-issue-date="{{ \Carbon\Carbon::parse($issue->issue_date)->toDateString() }}"
+                    min="{{ $issue->issue_date ? \Carbon\Carbon::parse($issue->issue_date)->toDateString() : now()->toDateString() }}"
+                    data-issue-date="{{ $issue->issue_date ? \Carbon\Carbon::parse($issue->issue_date)->toDateString() : now()->toDateString() }}"
                     required>
                 </td>
                 <td>
@@ -187,13 +188,14 @@
                     data-bs-target="#certificateModal"
                     data-id="{{ $issue->id }}"
                     data-diamonds_id="{{ $issue->diamonds_id }}"
-                    data-prediction="{{ $issue->diamond->prediction_weight }}">
+                    data-prediction="{{ $issue->diamond->prediction_weight ?? 0 }}">
                     Add & save
                   </button>
                 </td>
                 @endif
               </form>
             </tr>
+            @endif
             @endforeach
           </tbody>
         </table>
