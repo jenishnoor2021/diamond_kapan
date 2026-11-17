@@ -156,6 +156,11 @@
                             <i class="bx bx-buildings"></i> Company Detail
                         </a>
                     </li>
+                    <li>
+                        <a href="/admin/import">
+                            <i class="bx bx-buildings"></i> Import For Price update 
+                        </a>
+                    </li>
                 </ul>
             </li>
 
