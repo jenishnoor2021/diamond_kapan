@@ -158,7 +158,7 @@
                     </li>
                     <li>
                         <a href="/admin/import">
-                            <i class="bx bx-buildings"></i> Import For Price update 
+                            <i class="bx bx-file"></i> Import Certificate Excel 
                         </a>
                     </li>
                 </ul>

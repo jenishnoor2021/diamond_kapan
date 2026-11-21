@@ -23,6 +23,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PurchaseDiamondsExport;
 use Illuminate\Support\Facades\Redirect;
 use App\Imports\UpdateIssuePriceImport;
+use App\Imports\CertificateDiamondImport;
 
 class AdminDiamondController extends Controller
 {
@@ -706,10 +707,47 @@ class AdminDiamondController extends Controller
         return view('admin.diamond.import');
     }
 
+    // public function importPriceUpdate(Request $request)
+    // {
+    //     Excel::import(new UpdateIssuePriceImport, $request->file('import_file'));
+
+    //     return back()->with('success', 'Data Updated Successfully');
+    // }
+
     public function importPriceUpdate(Request $request)
     {
-        Excel::import(new UpdateIssuePriceImport, $request->file('import_file'));
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls,csv,txt',
+        ]);
 
-        return back()->with('success', 'Data Updated Successfully');
+        $import = new CertificateDiamondImport();
+        Excel::import($import, $request->file('import_file'));
+
+        $successCount = $import->getSuccessCount();
+        $notFoundDiamonds = $import->getNotFoundDiamonds();
+        $errorRows = $import->getErrorRows();
+
+        $msg = "Successfully imported/updated {$successCount} diamond(s).";
+        if (!empty($notFoundDiamonds)) {
+            $msg .= " | Warning: " . count($notFoundDiamonds) . " diamond(s) not found in system: " . implode(', ', array_slice($notFoundDiamonds, 0, 10));
+            if (count($notFoundDiamonds) > 10) {
+                $msg .= " and " . (count($notFoundDiamonds) - 10) . " more.";
+            }
+        }
+
+        if (!empty($errorRows)) {
+            $msg .= " | Errors in rows: " . implode(', ', array_slice($errorRows, 0, 5));
+        }
+
+        return back()->with(!empty($notFoundDiamonds) && $successCount == 0 ? 'error' : 'success', $msg);
+    }
+
+    public function downloadImportSample()
+    {
+        $filePath = public_path('sample-certificate-import.xlsx');
+        if (file_exists($filePath)) {
+            return response()->download($filePath, 'sample-certificate-import.xlsx');
+        }
+        return response()->download(public_path('sample-certificate-import.csv'), 'sample-certificate-import.csv');
     }
 }
